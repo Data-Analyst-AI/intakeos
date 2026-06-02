@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IntakeOS — AI-Powered Patient Intake</title>
+  <meta name="description" content="IntakeOS replaces missed calls with an AI voice agent that captures leads, books consultations, and recovers no-shows 24/7. HIPAA & PIPA compliant." />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['DM Serif Display', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            canvas:  '#F8FAFC',
+            ink:     '#1E293B',
+            muted:   '#64748B',
+            ice:     '#5F97C5',
+            'ice-light': '#EBF3FB',
+            'ice-mid':   '#B8D4EC',
+            border:  '#E2E8F0',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #F8FAFC; color: #1E293B; }
+
+    /* ── Headline accent ── */
+    .text-accent {
+      color: #5F97C5;
+    }
+
+    /* ── Thin section divider ── */
+    .divider {
+      height: 1px;
+      background: #E2E8F0;
+    }
+
+    /* ── Nav ── */
+    .nav-surface {
+      background: rgba(248,250,252,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    /* ── Mobile menu ── */
+    #mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    #mobile-menu.open { max-height: 340px; opacity: 1; }
+    .hamburger span {
+      display: block; width: 20px; height: 1.5px;
+      background: #64748B; border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .hamburger.active span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+    /* ── Primary button ── */
+    .btn-primary {
+      background: #5F97C5;
+      color: #fff;
+      transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: #4A82B0;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(95,151,197,0.28);
+    }
+
+    /* ── Ghost button ── */
+    .btn-ghost {
+      border: 1px solid #E2E8F0;
+      color: #64748B;
+      background: transparent;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+    .btn-ghost:hover {
+      border-color: #5F97C5;
+      color: #5F97C5;
+      background: #EBF3FB;
+    }
+
+    /* ── Compliance badge ── */
+    .badge {
+      border: 1px solid #B8D4EC;
+      background: #EBF3FB;
+      color: #4A82B0;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .card:hover {
+      border-color: #B8D4EC;
+      box-shadow: 0 4px 24px rgba(95,151,197,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* ── Step number ── */
+    .step-num {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border: 1px solid #B8D4EC;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+      color: #5F97C5;
+      background: #EBF3FB;
+    }
+
+    /* ── Stat accent ── */
+    .stat-bar { border-left: 2px solid #5F97C5; }
+
+    /* ── Specialty pill ── */
+    .pill {
+      border: 1px solid #E2E8F0;
+      color: #64748B;
+      background: #fff;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .pill:hover {
+      border-color: #5F97C5;
+      color: #2E6A9E;
+      background: #C8DFF2;
+      transform: translateY(-1px);
+    }
+
+    /* ── Feature icon dot ── */
+    .icon-dot {
+      width: 36px; height: 36px;
+      background: #EBF3FB;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #5F97C5;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Hero fade-up ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.75s ease forwards; }
+    .d1 { animation-delay: 0.05s; opacity: 0; }
+    .d2 { animation-delay: 0.2s;  opacity: 0; }
+    .d3 { animation-delay: 0.35s; opacity: 0; }
+    .d4 { animation-delay: 0.5s;  opacity: 0; }
+
+    /* ── Scroll reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Live dot ── */
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(1.5); }
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: live-pulse 2.2s ease-in-out infinite;
+    }
+
+    /* ── Pricing row ── */
+    .price-row { border-bottom: 1px solid #E2E8F0; }
+    .price-row:last-of-type { border-bottom: none; }
+
+    /* ── Hero subtle background pattern ── */
+    .hero-bg {
+      background-color: #F8FAFC;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(95,151,197,0.06) 0%, transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(95,151,197,0.04) 0%, transparent 50%);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <!-- ══════════════════════════════════
+       NAV
+  ══════════════════════════════════ -->
+  <nav class="nav-surface fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+
+        <a href="#" class="flex items-center gap-1">
+          <span class="font-display text-xl text-ink tracking-wide">IntakeOS</span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm text-muted font-light">
+          <a href="#how-it-works" class="hover:text-ink transition-colors duration-200">How It Works</a>
+          <a href="#specialties"  class="hover:text-ink transition-colors duration-200">Specialties</a>
+          <a href="#pricing"      class="hover:text-ink transition-colors duration-200">Pricing</a>
+          <a href="#compliance"   class="hover:text-ink transition-colors duration-200">Compliance</a>
+        </div>
+
+        <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
+           class="hidden md:inline-block btn-primary px-5 py-2.5 rounded-lg text-sm font-medium">
+          Get Started Now
+        </button>
+
+        <button id="hamburger-btn" class="hamburger md:hidden flex flex-col gap-1.5 p-1" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <div id="mobile-menu">
+        <div class="pt-5 pb-6 flex flex-col gap-4 border-t border-border mt-4">
+          <a href="#how-it-works" class="text-muted hover:text-ink text-sm font-light transition-colors mobile-link">How It Works</a>
+          <a href="#specialties"  class="text-muted hover:text-ink text-sm font-light transition-colors mobile-link">Specialties</a>
+          <a href="#pricing"      class="text-muted hover:text-ink text-sm font-light transition-colors mobile-link">Pricing</a>
+          <a href="#compliance"   class="text-muted hover:text-ink text-sm font-light transition-colors mobile-link">Compliance</a>
+          <button onclick="document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('contact-modal').classList.remove('hidden')"
+             class="btn-primary px-5 py-3 rounded-lg text-sm font-medium text-center mt-1">
+            Get Started Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+  <section class="hero-bg min-h-screen flex items-center pt-20">
+    <div class="max-w-5xl mx-auto px-6 py-24 text-center">
+
+      <!-- Headline -->
+      <h1 class="fade-up d1 font-display text-5xl md:text-7xl text-ink leading-tight mb-7">
+        Your clinic responds in<br/>
+        <span class="text-accent">15 seconds.</span><br/>
+        Every time.
+      </h1>
+
+      <!-- Video embed -->
+      <div class="fade-up d2 w-full max-w-3xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-lg">
+        <iframe width="100%" height="480"
+          src="https://www.youtube.com/embed/1xuQE-RfaZk"
+          title="IntakeOS Demo Video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Subheadline -->
+      <p class="fade-up d3 text-muted text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed mb-11">
+        IntakeOS replaces missed calls and slow follow-ups with an AI voice agent that captures leads, books consultations, sends reminders, and recovers no-shows — 24/7, fully automated.
+      </p>
+
+      <!-- Trust line -->
+      <div class="fade-up d3 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <p class="text-muted/60 text-sm font-light">No monthly fees. Pay only for verified attended consultations.</p>
+        <span class="hidden sm:block text-border">|</span>
+        <div class="flex items-center gap-2">
+          <div class="live-dot"></div>
+          <span class="text-muted/60 text-xs font-light">AI agent online 24/7</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       SOCIAL PROOF STATS
+  ══════════════════════════════════ -->
+  <section class="py-20 bg-canvas">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+
+        <div class="stat-bar pl-5 reveal">
+          <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The problem</p>
+          <p class="text-ink text-base font-light leading-relaxed">The average clinic loses 90% of web leads because they respond 47 hours too late.</p>
+        </div>
+
+        <div class="stat-bar pl-5 reveal" style="transition-delay:.1s">
+          <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The cost</p>
+          <p class="text-ink text-base font-light leading-relaxed">Every no-show is $200+ gone. Every lost fertility lead is $15,000 to your competitor.</p>
+        </div>
+
+        <div class="stat-bar pl-5 reveal sm:col-span-2 md:col-span-1" style="transition-delay:.2s">
+          <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The fix</p>
+          <p class="text-ink text-base font-light leading-relaxed">IntakeOS responds in 15 seconds. Every time. No staff required.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       HOW IT WORKS
+  ══════════════════════════════════ -->
+  <section id="how-it-works" class="py-24 bg-white">
+    <div class="max-w-4xl mx-auto px-6">
+
+      <div class="text-center mb-16 reveal">
+        <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">The System</p>
+        <h2 class="font-display text-4xl md:text-5xl text-ink">How IntakeOS works</h2>
+      </div>
+
+      <div class="space-y-4">
+
+        <div class="card rounded-2xl p-7 md:p-9 flex gap-5 reveal">
+          <div class="step-num">01</div>
+          <div>
+            <h3 class="font-display text-xl md:text-2xl text-ink mb-2">A potential patient reaches out</h3>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base">Web form, missed call, or after-hours inquiry — IntakeOS captures every lead instantly, no matter when they contact you.</p>
+          </div>
+        </div>
+
+        <div class="card rounded-2xl p-7 md:p-9 flex gap-5 reveal" style="transition-delay:.1s">
+          <div class="step-num">02</div>
+          <div>
+            <h3 class="font-display text-xl md:text-2xl text-ink mb-2">Our AI answers — every time, right away</h3>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base">During working hours, the agent picks up on the 3rd ring. After hours, it answers immediately. For inquiries submitted through your clinic's web form, the agent replies instantly — qualifies the patient and books an in-person consultation, without any staff involvement.</p>
+          </div>
+        </div>
+
+        <div class="card rounded-2xl p-7 md:p-9 flex gap-5 reveal" style="transition-delay:.2s">
+          <div class="step-num">03</div>
+          <div>
+            <h3 class="font-display text-xl md:text-2xl text-ink mb-2">You pay only when they walk through the door</h3>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base">IntakeOS sends reminders, confirms attendance, and recovers no-shows automatically. You're charged $150 USD only for verified, attended consultations — with a $100 USD monthly minimum.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       SPECIALTIES
+  ══════════════════════════════════ -->
+  <section id="specialties" class="py-24 bg-canvas">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <div class="text-center mb-14 reveal">
+        <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Specialties</p>
+        <h2 class="font-display text-3xl md:text-5xl text-ink mb-5">
+          Built for clinics where every consultation<br class="hidden md:block"/> is worth $4,000–$15,000
+        </h2>
+        <p class="text-muted text-base md:text-lg font-light max-w-2xl mx-auto">
+          A missed LASIK lead is $5,000 gone. A lost fertility patient is $15,000 to a competitor down the street. IntakeOS makes sure that never happens again.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 reveal">
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">LASIK &amp; Ophthalmology</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Fertility Clinics</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Cosmetic Surgery</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Hair Transplants</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Aesthetic Clinics</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Dental Implants</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       WHY INTAKEOS
+  ══════════════════════════════════ -->
+  <section class="py-24 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+
+      <div class="text-center mb-16 reveal">
+        <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Why IntakeOS</p>
+        <h2 class="font-display text-4xl md:text-5xl text-ink">Not another chatbot.<br/>A complete intake system.</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <div class="card rounded-2xl p-7 reveal">
+          <div class="icon-dot mb-5">$</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Zero risk pricing</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">No setup fee. $150 USD per attended consultation, with a $100 USD monthly minimum. Nothing more.</p>
+        </div>
+
+        <div class="card rounded-2xl p-7 reveal" style="transition-delay:.07s">
+          <div class="icon-dot mb-5">🔒</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Full compliance</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">HIPAA & PIPA compliant with NemoClaw audit logging. Built for regulated healthcare environments.</p>
+        </div>
+
+        <div class="card rounded-2xl p-7 reveal" style="transition-delay:.14s">
+          <div class="icon-dot mb-5">🎙</div>
+          <h3 class="font-semibold text-ink text-base mb-2">24/7 AI voice agent</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Responds in 15 seconds. Books, reminds, and recovers no-shows while your team sleeps.</p>
+        </div>
+
+        <div class="card rounded-2xl p-7 reveal" style="transition-delay:.21s">
+          <div class="icon-dot mb-5">🔗</div>
+          <h3 class="font-semibold text-ink text-base mb-2">No vendor lock-in</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Dedicated infrastructure. Your data, your system, your control.</p>
+        </div>
+
+        <div class="card rounded-2xl p-7 reveal sm:col-span-2" style="transition-delay:.28s">
+          <div class="icon-dot mb-5">⭐</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Built for premium clinics</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Not a generic chatbot. Configured specifically for your specialty, your brand, and your patient profile. IntakeOS speaks the language of Beverly Hills — not a call center.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       PRICING
+  ══════════════════════════════════ -->
+  <section id="pricing" class="py-24 bg-canvas">
+    <div class="max-w-xl mx-auto px-6">
+
+      <div class="text-center mb-10 reveal">
+        <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Pricing</p>
+        <h2 class="font-display text-4xl md:text-5xl text-ink">Simple pricing.<br/>Zero risk.</h2>
+      </div>
+
+      <div class="card rounded-2xl overflow-hidden reveal">
+
+        <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
+          <div>
+            <p class="text-ink font-medium">Setup</p>
+            <p class="text-muted text-sm font-light mt-1">Full system configuration for your clinic</p>
+          </div>
+          <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
+            $0 <span class="text-base font-sans text-muted">USD</span>
+          </p>
+        </div>
+
+        <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
+          <div>
+            <p class="text-ink font-medium">Per verified attended consultation</p>
+            <p class="text-muted text-sm font-light mt-1">Charged only when the patient attends</p>
+          </div>
+          <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
+            $150 <span class="text-base font-sans text-muted">USD</span>
+          </p>
+        </div>
+
+        <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
+          <div>
+            <p class="text-ink font-medium">Monthly minimum</p>
+            <p class="text-muted text-sm font-light mt-1">Only applies if there are no attended consultations</p>
+          </div>
+          <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
+            $100 <span class="text-base font-sans text-muted">USD</span>
+          </p>
+        </div>
+
+        <div class="flex items-start gap-3 p-7 md:p-9 bg-ice-light">
+          <span class="text-accent text-lg mt-0.5">✓</span>
+          <p class="text-muted text-sm font-light leading-relaxed">No setup cost. No risk. If the patient doesn't show up, you don't pay.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       COMPLIANCE
+  ══════════════════════════════════ -->
+  <section id="compliance" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-6 text-center reveal">
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 HIPAA Compliant</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 PIPA Compliant</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 NemoClaw Audit Logging</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 TLS 1.3 Encrypted</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════
+       FINAL CTA
+  ══════════════════════════════════ -->
+  <section id="demo" class="py-28 md:py-36 bg-canvas text-center">
+    <div class="max-w-3xl mx-auto px-6 reveal">
+
+      <p class="text-xs font-medium uppercase tracking-widest text-accent mb-5">Get Started</p>
+      <h2 class="font-display text-4xl md:text-6xl text-ink mb-6 leading-tight">
+        Stop losing patients.
+      </h2>
+      <p class="text-muted text-lg font-light max-w-xl mx-auto mb-11">
+        Every day without IntakeOS, your clinic misses calls, loses leads, and hands consultations to faster competitors. Get started today — no setup fee, no risk.
+      </p>
+      <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
+         class="btn-primary inline-block px-10 py-5 rounded-lg font-medium text-lg">
+        Get Started Now →
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       CONTACT MODAL
+  ══════════════════════════════════ -->
+  <div id="contact-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(30,41,59,0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+      <button onclick="document.getElementById('contact-modal').classList.add('hidden')"
+              class="absolute top-4 right-5 text-muted text-2xl hover:text-ink transition-colors">&times;</button>
+      <h3 class="font-display text-2xl text-ink mb-2">Get Started</h3>
+      <p class="text-muted text-sm font-light mb-6">Fill in your details and our team will be in touch within one business day.</p>
+      <div id="contact-form" class="space-y-4">
+        <input id="f-clinic" type="text" placeholder="Company or Clinic Name"
+               class="w-full border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-ice transition-colors" />
+        <input id="f-name" type="text" placeholder="Your Name"
+               class="w-full border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-ice transition-colors" />
+        <input id="f-phone" type="tel" placeholder="Phone Number"
+               class="w-full border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-ice transition-colors" />
+        <input id="f-email" type="email" placeholder="Email Address"
+               class="w-full border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-ice transition-colors" />
+        <button onclick="submitContactForm()"
+                class="btn-primary w-full py-3.5 rounded-lg font-medium text-base">
+          Send →
+        </button>
+      </div>
+      <div id="contact-success" class="hidden text-center py-6">
+        <p class="text-accent text-4xl mb-3">✓</p>
+        <p class="font-display text-xl text-ink mb-2">Message received.</p>
+        <p class="text-muted text-sm font-light">Our team will respond within one business day.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+  ══════════════════════════════════ -->
+  <footer class="bg-white border-t border-border py-10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-muted text-sm font-light text-center md:text-left">
+      <p class="text-ink/60">© 2026 IntakeOS. All rights reserved.</p>
+      <p>HIPAA & PIPA compliant · British Columbia, Canada & Western United States.</p>
+      <a href="mailto:operations@go.arbitrageclaw.net" class="text-accent hover:text-ice transition-colors">
+        operations@go.arbitrageclaw.net
+      </a>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════ -->
+  <script>
+    function submitContactForm() {
+      const clinic = document.getElementById('f-clinic').value.trim();
+      const name   = document.getElementById('f-name').value.trim();
+      const phone  = document.getElementById('f-phone').value.trim();
+      const email  = document.getElementById('f-email').value.trim();
+      if (!clinic || !name || !email) { alert('Please fill in all required fields.'); return; }
+      const subject = encodeURIComponent('IntakeOS — New Inquiry from ' + clinic);
+      const body = encodeURIComponent('Clinic: ' + clinic + '\nName: ' + name + '\nPhone: ' + phone + '\nEmail: ' + email);
+      window.location.href = 'mailto:operations@go.arbitrageclaw.net?subject=' + subject + '&body=' + body;
+      document.getElementById('contact-form').classList.add('hidden');
+      document.getElementById('contact-success').classList.remove('hidden');
+    }
+
+    const btn  = document.getElementById('hamburger-btn');
+    const menu = document.getElementById('mobile-menu');
+
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      menu.classList.toggle('open');
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        btn.classList.remove('active');
+        menu.classList.remove('open');
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
