@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IntakeOS — Clinic Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1E293B; --muted: #64748B; --accent: #5F97C5;
+      --canvas: #F8FAFC; --white: #FFFFFF; --border: #E2E8F0;
+      --ice: #EBF3FA; --success: #10B981; --error: #EF4444;
+      --warn: #F59E0B; --dark: #0F172A;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--canvas); color: var(--ink); min-height: 100vh; line-height: 1.6; }
+
+    /* HEADER */
+    header { background: var(--dark); padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: #fff; text-decoration: none; }
+    .header-secure { font-size: 0.72rem; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px; }
+    .header-secure::before { content: '🔒'; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, var(--dark) 0%, #1a3a5c 100%); color: #fff; text-align: center; padding: 56px 24px 48px; }
+    .hero-eyebrow { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 400; margin-bottom: 14px; line-height: 1.2; }
+    .hero p { font-size: 0.95rem; font-weight: 300; color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto 24px; }
+    .hero-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 5px 14px; font-size: 0.72rem; color: rgba(255,255,255,0.7); font-weight: 500; }
+
+    /* HOW INTAKEOS WORKS BANNER */
+    .how-it-works-bar { background: var(--ice); border-bottom: 1px solid var(--border); padding: 0; }
+    .how-it-works-inner { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+    .how-bar-title { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .how-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .how-card-icon { font-size: 1.3rem; margin-bottom: 8px; }
+    .how-card h4 { font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .how-card p { font-size: 0.76rem; color: var(--muted); font-weight: 300; line-height: 1.5; }
+
+    /* PROGRESS */
+    .progress-wrap { background: var(--white); border-bottom: 1px solid var(--border); padding: 18px 24px; }
+    .progress-steps { display: flex; align-items: center; max-width: 900px; margin: 0 auto; }
+    .step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .step:not(:last-child)::after { content: ''; position: absolute; top: 13px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; transition: background 0.3s; }
+    .step.done:not(:last-child)::after { background: var(--accent); }
+    .step-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; color: var(--muted); position: relative; z-index: 1; transition: all 0.3s; }
+    .step.active .step-dot { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .step.done .step-dot { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .step-label { font-size: 0.62rem; color: var(--muted); margin-top: 5px; font-weight: 500; text-align: center; white-space: nowrap; }
+    .step.active .step-label { color: var(--accent); }
+
+    /* MAIN */
+    main { max-width: 780px; margin: 0 auto; padding: 44px 24px 80px; }
+
+    /* SECTIONS */
+    .form-section { display: none; animation: fadeUp 0.3s ease both; }
+    .form-section.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { margin-bottom: 28px; }
+    .section-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.7rem; font-weight: 400; color: var(--ink); margin-bottom: 6px; }
+    .section-header p { font-size: 0.88rem; color: var(--muted); font-weight: 300; }
+
+    /* FIELDS */
+    .field { margin-bottom: 20px; }
+    label.field-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    .req { color: var(--accent); margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="url"],
+    input[type="number"], input[type="time"], input[type="password"], select, textarea {
+      width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--ink);
+      background: var(--white); transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(95,151,197,0.1); }
+    input.error, select.error, textarea.error { border-color: var(--error); }
+    .field-error { font-size: 0.73rem; color: var(--error); margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+    .field-hint { font-size: 0.73rem; color: var(--muted); margin-top: 4px; font-weight: 300; }
+    textarea { resize: vertical; min-height: 80px; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
+    .subsection-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+
+    /* RADIO / CHECK */
+    .radio-group, .check-group { display: flex; flex-direction: column; gap: 9px; }
+    .radio-option, .check-option { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .radio-option:hover, .check-option:hover { border-color: var(--accent); background: var(--ice); }
+    .radio-option input, .check-option input { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+    .radio-option span, .check-option span { font-size: 0.84rem; color: var(--ink); line-height: 1.4; }
+    .radio-option small, .check-option small { display: block; font-size: 0.73rem; color: var(--muted); margin-top: 2px; font-weight: 300; }
+
+    /* INFO BOX */
+    .info-box { background: var(--ice); border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; }
+    .info-box-title { font-size: 0.75rem; font-weight: 600; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .info-box p { font-size: 0.82rem; color: var(--ink); font-weight: 300; line-height: 1.6; }
+
+    .warn-box { background: #fffbeb; border: 1px solid var(--warn); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; }
+    .warn-box p { font-size: 0.82rem; color: #92400e; font-weight: 400; line-height: 1.6; }
+
+    /* PLATFORM CARDS */
+    .platform-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+    .platform-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 12px; }
+    .platform-name { font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+    .platform-badge { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+    .badge-required { background: #fee2e2; color: #991b1b; }
+    .badge-optional { background: #f0fdf4; color: #166534; }
+    .platform-desc { font-size: 0.8rem; color: var(--muted); font-weight: 300; line-height: 1.55; margin-bottom: 14px; }
+    .platform-signup { display: inline-block; font-size: 0.75rem; font-weight: 500; color: var(--accent); text-decoration: none; margin-bottom: 12px; }
+    .platform-signup:hover { text-decoration: underline; }
+    .api-field label.field-label { font-size: 0.76rem; color: var(--muted); }
+    .api-input-wrap { position: relative; }
+    .api-input-wrap input { font-family: 'Courier New', monospace; font-size: 0.8rem; padding-right: 70px; background: #f8fafc; }
+    .toggle-vis { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--accent); cursor: pointer; font-weight: 500; background: none; border: none; padding: 4px 6px; }
+
+    /* HOURS */
+    .hours-row { display: grid; grid-template-columns: 110px 1fr 1fr 90px; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px 13px; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; }
+    .hours-row .day-label { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+    .hours-row input[type="time"] { padding: 8px 10px; font-size: 0.8rem; }
+    .hours-row .closed-wrap { display: flex; align-items: center; gap: 6px; font-size: 0.76rem; color: var(--muted); cursor: pointer; }
+    .hours-row .closed-wrap input { width: auto; accent-color: var(--accent); }
+    @media (max-width: 560px) { .hours-row { grid-template-columns: 1fr 1fr; } .hours-row .day-label { grid-column: 1/-1; } }
+
+    /* STRIPE */
+    .stripe-section { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 20px; }
+    .stripe-logo { font-size: 0.75rem; font-weight: 600; color: #635bff; margin-bottom: 4px; letter-spacing: 0.02em; }
+    .stripe-section h4 { font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+    .stripe-section p { font-size: 0.8rem; color: var(--muted); font-weight: 300; margin-bottom: 18px; line-height: 1.6; }
+    .card-row { display: grid; grid-template-columns: 1fr 120px 80px; gap: 12px; }
+    @media (max-width: 520px) { .card-row { grid-template-columns: 1fr; } }
+    .card-icons { display: flex; gap: 6px; margin-top: 6px; }
+    .card-icon { background: var(--border); border-radius: 4px; padding: 3px 8px; font-size: 0.65rem; color: var(--muted); font-weight: 600; }
+
+    /* SOUL / HEARTBEAT */
+    .profile-section { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 18px; }
+    .profile-section h4 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--ink); margin-bottom: 4px; }
+    .profile-section .subtitle { font-size: 0.78rem; color: var(--muted); font-weight: 300; margin-bottom: 18px; line-height: 1.5; }
+
+    /* LEGAL */
+    .legal-box { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 20px; }
+    .legal-box h4 { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 14px; }
+    .legal-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .legal-item:last-of-type { border-bottom: none; }
+    .legal-item input[type="checkbox"] { margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; width: 16px; height: 16px; }
+    .legal-item-text { font-size: 0.83rem; color: var(--ink); line-height: 1.5; }
+    .legal-item-text a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .legal-item-text a:hover { text-decoration: underline; }
+    .legal-item-text small { display: block; font-size: 0.73rem; color: var(--muted); margin-top: 3px; font-weight: 300; }
+
+    /* NAV BUTTONS */
+    .form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .btn { font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 500; padding: 11px 26px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #4a85b5; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-submit { background: var(--dark); color: #fff; padding: 13px 34px; font-size: 0.92rem; }
+    .btn-submit:hover { background: #0a0f1a; }
+
+    /* SUCCESS */
+    #success-screen { display: none; text-align: center; padding: 70px 24px; animation: fadeUp 0.4s ease both; }
+    .success-icon { width: 60px; height: 60px; border-radius: 50%; background: var(--ice); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 1.6rem; }
+    #success-screen h2 { font-family: 'DM Serif Display', serif; font-size: 1.9rem; font-weight: 400; margin-bottom: 10px; }
+    #success-screen p { font-size: 0.9rem; color: var(--muted); font-weight: 300; max-width: 420px; margin: 0 auto 28px; }
+    .next-steps { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 24px; max-width: 420px; margin: 0 auto; text-align: left; }
+    .next-steps h4 { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .nsi { display: flex; gap: 12px; margin-bottom: 12px; font-size: 0.84rem; color: var(--ink); }
+    .nsi-num { width: 22px; height: 22px; border-radius: 50%; background: var(--ice); color: var(--accent); font-size: 0.68rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 14px; max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 32px; position: relative; }
+    .modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 400; margin-bottom: 16px; color: var(--ink); }
+    .modal-body { font-size: 0.82rem; color: var(--muted); line-height: 1.8; }
+    .modal-body h4 { color: var(--ink); font-size: 0.85rem; font-weight: 600; margin: 18px 0 6px; }
+    .modal-close { position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 1.4rem; color: var(--muted); cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="https://arbitrageclaw.net" class="logo">IntakeOS</a>
+  <span class="header-secure">Secure clinic onboarding · operations@go.arbitrageclaw.net</span>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-eyebrow">Clinic Onboarding</span>
+  <h1>Activate your IntakeOS system.</h1>
+  <p>Complete this form once. IntakeOS handles everything from first contact through confirmed consultation — 24/7, fully automated, zero setup risk.</p>
+  <div class="hero-badges">
+    <span class="badge">HIPAA Compliant</span>
+    <span class="badge">PIPA Compliant</span>
+    <span class="badge">$0 Setup Fee</span>
+    <span class="badge">$150 per attended consultation</span>
+    <span class="badge">Powered by Stripe</span>
+  </div>
+</div>
+
+<!-- HOW INTAKEOS WORKS -->
+<div class="how-it-works-bar">
+  <div class="how-it-works-inner">
+    <div class="how-bar-title">How IntakeOS works for your clinic</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-card-icon">📞</div>
+        <h4>Phone Calls — Business Hours</h4>
+        <p>When your staff are available, IntakeOS picks up after 3 rings. No voicemail. No missed lead. The AI intake specialist qualifies and books the caller immediately.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-card-icon">🌙</div>
+        <h4>Phone Calls — After Hours</h4>
+        <p>Outside your set operating hours, IntakeOS answers immediately on the first ring — 24/7. Patients never hear voicemail, even at 2am.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-card-icon">📋</div>
+        <h4>Web Form Inquiries — 24/7</h4>
+        <p>Any patient who submits a web form receives an AI-driven reply within 15 seconds, any time of day. IntakeOS qualifies them and books a consultation automatically.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-card-icon">🤖</div>
+        <h4>AI Intake Specialist</h4>
+        <p>IntakeOS acts as your front-desk intake coordinator — it asks qualifying questions, answers FAQs, confirms insurance or financing eligibility, and books the appointment.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-card-icon">📅</div>
+        <h4>Pre-Consultation Only</h4>
+        <p>IntakeOS manages everything before the patient walks through your door. The consultation itself is 100% human — your doctors, your care, your relationship.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-card-icon">🔁</div>
+        <h4>No-Show Recovery</h4>
+        <p>If a patient misses their appointment, IntakeOS waits 2 hours, then prompts your clinic to confirm attendance. If no-show confirmed, an automated rebook workflow triggers immediately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step active" id="step-1"><div class="step-dot">1</div><span class="step-label">Clinic Info</span></div>
+    <div class="step" id="step-2"><div class="step-dot">2</div><span class="step-label">Hours</span></div>
+    <div class="step" id="step-3"><div class="step-dot">3</div><span class="step-label">Soul Profile</span></div>
+    <div class="step" id="step-4"><div class="step-dot">4</div><span class="step-label">Heartbeat</span></div>
+    <div class="step" id="step-5"><div class="step-dot">5</div><span class="step-label">Platforms</span></div>
+    <div class="step" id="step-6"><div class="step-dot">6</div><span class="step-label">Billing</span></div>
+    <div class="step" id="step-7"><div class="step-dot">7</div><span class="step-label">Review</span></div>
+  </div>
+</div>
+
+<main>
+
+<!-- ═══════════════════════════════════════
+     SECTION 1 — CLINIC INFORMATION
+═══════════════════════════════════════ -->
+<div class="form-section active" id="section-1">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 1 of 7</div>
+    <h2>Clinic Information</h2>
+    <p>Basic details about your clinic and the primary contact responsible for this onboarding.</p>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Clinic Legal Name <span class="req">*</span></label>
+    <input type="text" id="clinic-name" placeholder="e.g. Clarity Vision Clinic Inc." />
+    <div class="field-error" id="err-clinic-name">Required.</div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Clinic Specialty <span class="req">*</span></label>
+    <div class="check-group" id="specialty-group">
+      <label class="check-option"><input type="checkbox" value="LASIK" /><span>LASIK / Laser Eye Surgery</span></label>
+      <label class="check-option"><input type="checkbox" value="Fertility" /><span>Fertility</span></label>
+      <label class="check-option"><input type="checkbox" value="Cosmetic Surgery" /><span>Cosmetic Surgery</span></label>
+      <label class="check-option"><input type="checkbox" value="Hair Restoration" /><span>Hair Restoration / Transplants</span></label>
+      <label class="check-option"><input type="checkbox" value="Medical Aesthetics" /><span>Medical Aesthetics</span></label>
+      <label class="check-option"><input type="checkbox" value="Dental Implants" /><span>Dental Implants</span></label>
+      <label class="check-option"><input type="checkbox" value="Other" /><span>Other</span></label>
+    </div>
+    <div class="field-error" id="err-specialty">Please select at least one specialty.</div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Clinic Website URL</label>
+    <input type="url" id="clinic-url" placeholder="https://yourclinic.com" />
+  </div>
+
+  <hr class="divider" />
+  <div class="subsection-label">Primary Contact — IntakeOS Setup Owner</div>
+
+  <div class="two-col">
+    <div class="field">
+      <label class="field-label">Full Name <span class="req">*</span></label>
+      <input type="text" id="contact-name" placeholder="First and last name" />
+      <div class="field-error" id="err-contact-name">Required.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Role / Title</label>
+      <input type="text" id="contact-role" placeholder="e.g. Practice Manager" />
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="field">
+      <label class="field-label">Email Address <span class="req">*</span></label>
+      <input type="email" id="contact-email" placeholder="you@yourclinic.com" />
+      <div class="field-error" id="err-contact-email">Enter a valid email address.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Direct Phone Number <span class="req">*</span></label>
+      <input type="tel" id="contact-phone" placeholder="+1 (555) 000-0000" />
+      <div class="field-error" id="err-contact-phone">Required.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="field">
+      <label class="field-label">City <span class="req">*</span></label>
+      <input type="text" id="contact-city" placeholder="e.g. Vancouver" />
+      <div class="field-error" id="err-contact-city">Required.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Country <span class="req">*</span></label>
+      <select id="contact-country">
+        <option value="">Select country</option>
+        <option>Canada</option>
+        <option>United States</option>
+        <option>Other</option>
+      </select>
+      <div class="field-error" id="err-contact-country">Required.</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Clinic Phone Number IntakeOS Will Answer <span class="req">*</span></label>
+    <input type="tel" id="clinic-phone" placeholder="+1 (555) 000-0000" />
+    <div class="field-hint">This is the number patients call. IntakeOS will intercept this line.</div>
+    <div class="field-error" id="err-clinic-phone">Required.</div>
+  </div>
+
+  <div class="form-nav">
+    <span></span>
+    <button class="btn btn-primary" onclick="goTo(2)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 2 — HOURS
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-2">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 2 of 7</div>
+    <h2>Hours of Operation</h2>
+    <p>IntakeOS uses your hours to determine call-handling mode: answering on the 3rd ring during open hours, or immediately after hours.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">How hours affect IntakeOS behaviour</div>
+    <p><strong>During open hours:</strong> IntakeOS monitors your phone line. If staff are on another call or don't pick up within 3 rings, IntakeOS answers and handles the inquiry.<br/>
+    <strong>Outside open hours:</strong> IntakeOS answers immediately on the first ring — 24/7, including weekends and holidays.<br/>
+    <strong>Web form inquiries:</strong> Always handled within 15 seconds, regardless of hour.</p>
+  </div>
+
+  <div class="subsection-label">Weekly Schedule</div>
+  <div id="hours-grid"></div>
+
+  <hr class="divider" />
+  <div class="subsection-label">After-Hours Handling Preference</div>
+
+  <div class="field">
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="after-hours" value="IntakeOS handles all inquiries 24/7" /><span>IntakeOS handles all inquiries 24/7<small>Recommended — maximum lead capture, no voicemail ever.</small></span></label>
+      <label class="radio-option"><input type="radio" name="after-hours" value="IntakeOS handles only when clinic is closed" /><span>IntakeOS covers only when clinic is closed<small>Staff answer during hours; IntakeOS takes over after hours.</small></span></label>
+      <label class="radio-option"><input type="radio" name="after-hours" value="Forward after-hours with transcript" /><span>After-hours calls handled with transcript forwarded<small>IntakeOS manages the call and emails a summary brief to a staff member.</small></span></label>
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 3 — SOUL PROFILE
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-3">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 3 of 7</div>
+    <h2>Soul Profile</h2>
+    <p>The Soul Profile defines the personality, tone, and values of your IntakeOS AI agent. This is how your clinic sounds to every patient — every call, every message.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">What is the Soul Profile?</div>
+    <p>IntakeOS's AI agent speaks on behalf of your clinic. The Soul Profile configures its name, voice, tone, and how it introduces itself. A well-defined Soul Profile makes the AI feel like a trained member of your team — not a robot.</p>
+  </div>
+
+  <div class="profile-section">
+    <h4>Agent Identity</h4>
+    <p class="subtitle">How your AI intake specialist presents itself to patients.</p>
+
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Agent First Name <span class="req">*</span></label>
+        <input type="text" id="agent-name" placeholder="e.g. Alex, Jordan, Sam" />
+        <div class="field-hint">Patients will hear this name. Choose a neutral, professional first name.</div>
+        <div class="field-error" id="err-agent-name">Required.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Agent Role Title</label>
+        <input type="text" id="agent-title" placeholder="e.g. Patient Coordinator" />
+        <div class="field-hint">Used in email and SMS sign-offs.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Agent Introduction Script <span class="req">*</span></label>
+      <textarea id="agent-intro" placeholder="e.g. Thank you for calling [Clinic Name]. This is Alex, your patient coordinator. How can I help you today?"></textarea>
+      <div class="field-hint">This is the exact greeting patients hear when IntakeOS answers. Keep it warm and under 2 sentences.</div>
+      <div class="field-error" id="err-agent-intro">Required.</div>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <h4>Clinic Voice & Tone</h4>
+    <p class="subtitle">Choose the communication style that best matches your clinic's brand.</p>
+
+    <div class="field">
+      <label class="field-label">Preferred Tone <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="tone" value="Warm and empathetic" /><span>Warm and empathetic<small>Best for fertility, cosmetic surgery, aesthetics — emotionally sensitive procedures.</small></span></label>
+        <label class="radio-option"><input type="radio" name="tone" value="Professional and clinical" /><span>Professional and clinical<small>Best for LASIK, dental implants — procedure-focused, efficiency-first.</small></span></label>
+        <label class="radio-option"><input type="radio" name="tone" value="Friendly and conversational" /><span>Friendly and conversational<small>Approachable and relaxed — good for aesthetic and wellness clinics.</small></span></label>
+        <label class="radio-option"><input type="radio" name="tone" value="Luxury and premium" /><span>Luxury and premium<small>Elevated, concierge-level language — for high-ticket private clinics.</small></span></label>
+      </div>
+      <div class="field-error" id="err-tone">Please select a tone.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Words or phrases to always use</label>
+      <textarea id="words-always" placeholder="e.g. 'consultation' not 'appointment', 'procedure' not 'surgery', patient's first name always used"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Words or phrases to never use</label>
+      <textarea id="words-never" placeholder="e.g. never say 'cheap', never mention competitor names, never discuss pricing unless asked"></textarea>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <h4>Patient Language</h4>
+    <p class="subtitle">Languages your patient population speaks.</p>
+    <div class="field">
+      <label class="field-label">Primary language</label>
+      <select id="lang-primary">
+        <option>English</option>
+        <option>French</option>
+        <option>Spanish</option>
+        <option>Mandarin</option>
+        <option>Cantonese</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Secondary language (if applicable)</label>
+      <input type="text" id="lang-secondary" placeholder="e.g. Spanish, Punjabi, Tagalog" />
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(4)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 4 — HEARTBEAT FILE
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-4">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 4 of 7</div>
+    <h2>Heartbeat Configuration</h2>
+    <p>The Heartbeat file defines what IntakeOS knows about your procedures, pricing, and qualifying logic — so it can answer patient questions accurately and book the right people.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">What is the Heartbeat file?</div>
+    <p>The Heartbeat is the knowledge base your AI intake agent uses during every conversation. It knows your procedures, typical consultation costs, financing options, and what questions to ask to qualify a patient. The more detail you provide here, the more accurately IntakeOS qualifies and books on your behalf.</p>
+  </div>
+
+  <div class="profile-section">
+    <h4>Procedures Offered</h4>
+    <p class="subtitle">List each procedure IntakeOS should be able to discuss and book consultations for.</p>
+    <div id="procedures-list">
+      <div class="procedure-entry" style="margin-bottom:12px;">
+        <div class="two-col" style="margin-bottom:8px;">
+          <div class="field" style="margin-bottom:0"><label class="field-label">Procedure Name</label><input type="text" class="proc-name" placeholder="e.g. LASIK Eye Surgery" /></div>
+          <div class="field" style="margin-bottom:0"><label class="field-label">Consultation Fee (if any)</label><input type="text" class="proc-fee" placeholder="e.g. $0, $150, complimentary" /></div>
+        </div>
+        <div class="field" style="margin-bottom:0"><label class="field-label">Key qualifying question for this procedure</label><input type="text" class="proc-qualify" placeholder="e.g. Do you currently wear glasses or contact lenses?" /></div>
+      </div>
+    </div>
+    <button type="button" onclick="addProcedure()" style="font-size:0.78rem; color:var(--accent); background:none; border:none; cursor:pointer; font-weight:500; margin-top:6px;">+ Add another procedure</button>
+  </div>
+
+  <div class="profile-section">
+    <h4>Consultation Booking Logic</h4>
+    <p class="subtitle">How IntakeOS should offer and confirm appointment slots.</p>
+
+    <div class="field">
+      <label class="field-label">How are consultation slots offered to patients? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="booking-mode" value="IntakeOS offers 2 time options" /><span>IntakeOS offers 2 available time options<small>Recommended — reduces back-and-forth, higher conversion.</small></span></label>
+        <label class="radio-option"><input type="radio" name="booking-mode" value="Patient chooses from calendar link" /><span>Patient is sent a calendar booking link<small>IntakeOS qualifies, then sends a Calendly or similar link.</small></span></label>
+        <label class="radio-option"><input type="radio" name="booking-mode" value="Staff confirm after qualification" /><span>Staff confirm the slot after IntakeOS qualifies<small>IntakeOS qualifies and captures intent; staff call back to book.</small></span></label>
+      </div>
+      <div class="field-error" id="err-booking-mode">Please select an option.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Minimum qualification requirements to book <span class="req">*</span></label>
+      <textarea id="qualify-rules" placeholder="e.g. Patient must be 18+, not currently pregnant, have realistic expectations about outcomes, and not have had prior eye surgery (for LASIK)"></textarea>
+      <div class="field-hint">IntakeOS will only book patients who meet these criteria.</div>
+      <div class="field-error" id="err-qualify-rules">Required.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Financing / payment options to mention</label>
+      <textarea id="financing" placeholder="e.g. 0% interest financing available through Medicard, monthly payment plans from $99/mo"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Frequently asked questions IntakeOS should be able to answer</label>
+      <textarea id="faqs" style="min-height:120px" placeholder="e.g. Q: Is LASIK painful? A: Most patients feel only mild pressure and the procedure takes less than 15 minutes per eye. &#10;Q: Am I a candidate? A: We'll assess that at your free consultation..."></textarea>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <h4>No-Show & Attendance Confirmation</h4>
+    <p class="subtitle">How IntakeOS handles consultation attendance verification and no-show recovery.</p>
+
+    <div class="warn-box">
+      <p>⏱ <strong>Attendance confirmation workflow:</strong> IntakeOS will wait 2 hours after the scheduled consultation start time, then send your clinic a prompt asking whether the patient attended. If no confirmation is received or a no-show is confirmed, IntakeOS automatically triggers a rebook workflow to re-engage the patient.</p>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Who receives the attendance confirmation prompt? <span class="req">*</span></label>
+      <input type="email" id="attendance-email" placeholder="practicemanager@yourclinic.com" />
+      <div class="field-hint">This person will receive a prompt 2 hours after each consultation. They confirm attendance with a single click.</div>
+      <div class="field-error" id="err-attendance-email">Required.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">No-show rebook message preference</label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="rebook-channel" value="SMS" /><span>SMS only</span></label>
+        <label class="radio-option"><input type="radio" name="rebook-channel" value="Email" /><span>Email only</span></label>
+        <label class="radio-option"><input type="radio" name="rebook-channel" value="SMS and Email" /><span>Both SMS and email<small>Recommended for highest rebook rate.</small></span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(5)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 5 — PLATFORMS & API KEYS
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-5">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 5 of 7</div>
+    <h2>Platform Subscriptions & API Keys</h2>
+    <p>IntakeOS runs on 8 platforms. All accounts are created by your clinic, paid directly to each vendor, in your clinic's name. Arbitrage Claw never holds your credentials or pays your platform bills. Our team handles all technical configuration once your keys are provided.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">Why these specific platforms?</div>
+    <p>Every platform on this list was selected because it has a documented, tested API that IntakeOS has already been built and verified against. Substituting any platform creates a custom build — which changes the pricing, timeline, and warranty on your deployment. The stack is not arbitrary — it is how we guarantee the 15-second response time and compliance logging we promised.</p>
+  </div>
+
+  <div class="warn-box">
+    <p>💡 <strong>How to get your API key:</strong> After subscribing to each platform, navigate to their account settings or developer/API section. Copy your API key and paste it in the field provided. Your keys are transmitted securely and never stored by Arbitrage Claw — they go directly to your system's engineer for configuration.</p>
+  </div>
+
+  <!-- VPS SERVER -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">Private Server — OVH Montreal (Canada) or LiquidWeb HIPAA (US)</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">ovhcloud.com (Canada) · liquidweb.com (US)</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">This is your clinic's own private server — the foundation of IntakeOS. Patient data lives here and never leaves this server. Canadian clinics use OVH Montreal, which keeps all data on Canadian soil as required by PIPA/PIPEDA. US clinics use LiquidWeb's HIPAA-compliant hosting. You own the server. Arbitrage Claw manages the software that runs on it. Estimated cost: ~$26–59 USD/month depending on location.</p>
+    <div class="two-col">
+      <div>
+        <a class="platform-signup" href="https://www.ovhcloud.com/en-ca/vps/" target="_blank">→ OVH Montreal VPS (Canadian clinics)</a>
+      </div>
+      <div>
+        <a class="platform-signup" href="https://www.liquidweb.com/hipaa-compliant-hosting/" target="_blank">→ LiquidWeb HIPAA (US clinics)</a>
+      </div>
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label class="field-label">Server IP address (provided after provisioning)</label>
+      <input type="text" id="api-vps-ip" placeholder="e.g. 192.168.1.1 — your engineer will provide this" />
+      <div class="field-hint">Leave blank for now — your engineer will configure this during setup.</div>
+    </div>
+  </div>
+
+  <!-- GOHIGHLEVEL -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">GoHighLevel (GHL)</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">gohighlevel.com · $97 USD/month</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">GoHighLevel is the CRM (Customer Relationship Management) layer of IntakeOS. Every patient inquiry, qualifying conversation, booking, attendance confirmation, and no-show recovery is tracked here. Your Practice Manager sees every patient interaction in one place via the GHL mobile app. This does NOT replace your clinical software (Jane App, Cliniko, etc.) — it manages unbooked prospects only. The single new staff task is replying ATTENDED or NOSHOW to one email per consultation from GHL.</p>
+    <a class="platform-signup" href="https://www.gohighlevel.com" target="_blank">→ Subscribe at gohighlevel.com</a>
+    <div class="api-field field">
+      <label class="field-label">GoHighLevel API Key</label>
+      <div class="api-input-wrap">
+        <input type="password" id="api-ghl" placeholder="Paste your GHL API key here" />
+        <button class="toggle-vis" onclick="toggleVis('api-ghl', this)">Show</button>
+      </div>
+      <div class="field-hint">Found in GHL: Settings → API Keys → Create new key</div>
+    </div>
+    <div class="field">
+      <label class="field-label">GHL Location ID (Sub-Account ID)</label>
+      <input type="text" id="api-ghl-location" placeholder="e.g. abc123xyz" />
+      <div class="field-hint">Found in GHL: Settings → Business Info → Location ID</div>
+    </div>
+  </div>
+
+  <!-- TWILIO -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">Twilio Elastic SIP Trunk</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">twilio.com · ~$20–60 USD/month</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">Twilio is the telecommunications backbone of IntakeOS. It is what allows your clinic's existing phone number to be ported seamlessly — patients continue calling the same number they always have. During business hours, Twilio routes the call to your staff first; if nobody answers within 3 rings (~15 seconds), it transfers the call to the AI agent. After hours, it routes directly to the AI agent with zero delay. Twilio also sends all patient SMS messages: confirmations, reminders, and rebook offers.</p>
+    <a class="platform-signup" href="https://twilio.com" target="_blank">→ Subscribe at twilio.com</a>
+    <div class="two-col">
+      <div class="api-field field">
+        <label class="field-label">Twilio Account SID</label>
+        <div class="api-input-wrap">
+          <input type="password" id="api-twilio-sid" placeholder="Account SID" />
+          <button class="toggle-vis" onclick="toggleVis('api-twilio-sid', this)">Show</button>
+        </div>
+      </div>
+      <div class="api-field field">
+        <label class="field-label">Twilio Auth Token</label>
+        <div class="api-input-wrap">
+          <input type="password" id="api-twilio-token" placeholder="Auth Token" />
+          <button class="toggle-vis" onclick="toggleVis('api-twilio-token', this)">Show</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETELL AI -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">Retell AI</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">retellai.com · ~$14 USD/month estimated</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">Retell AI is the voice intelligence layer — it is the technology that makes the AI intake agent sound natural and conduct real qualifying conversations with patients. Connected to your phone line via Twilio, it handles every inbound call when your staff aren't available, asks your qualifying questions, offers available time slots, and books the consultation. It records every call and sends a full transcript and audio URL to GoHighLevel within 60 seconds of the call ending.</p>
+    <a class="platform-signup" href="https://retellai.com" target="_blank">→ Subscribe at retellai.com</a>
+    <div class="api-field field">
+      <label class="field-label">Retell AI API Key</label>
+      <div class="api-input-wrap">
+        <input type="password" id="api-retell" placeholder="Paste your Retell AI API key here" />
+        <button class="toggle-vis" onclick="toggleVis('api-retell', this)">Show</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ELEVENLABS -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">ElevenLabs</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">elevenlabs.io · $5–22 USD/month</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">ElevenLabs provides the voice model used by your AI intake agent — this is what determines how the agent sounds to patients. The voice is configured inside Retell AI and matched to your clinic's preferred tone (warm and empathetic, professional and precise, or friendly and conversational). The Starter plan at $5/month is sufficient for most clinics. This is the only platform where you do not need an API key — it is configured by your engineer directly inside Retell AI.</p>
+    <a class="platform-signup" href="https://elevenlabs.io" target="_blank">→ Subscribe at elevenlabs.io</a>
+    <div class="info-box" style="margin-top:12px; margin-bottom:0;">
+      <div class="info-box-title">No API key required</div>
+      <p>ElevenLabs is configured by your engineer inside Retell AI. Simply subscribe and confirm your account is active — your engineer handles the rest.</p>
+    </div>
+  </div>
+
+  <!-- SENDGRID -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">SendGrid</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">sendgrid.com · ~$20 USD/month</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">SendGrid handles all automated emails that IntakeOS sends on behalf of your clinic: patient booking confirmations, 48-hour and day-of reminders, Pre-Consultation Briefs to your staff before each appointment, attendance confirmation requests, no-show recovery messages, and monthly performance reports. Emails are sent from your clinic's own domain (e.g., info@yourclinic.com) with full SPF/DKIM/DMARC authentication — so they arrive in inboxes, not spam folders.</p>
+    <a class="platform-signup" href="https://sendgrid.com" target="_blank">→ Subscribe at sendgrid.com</a>
+    <div class="api-field field">
+      <label class="field-label">SendGrid API Key</label>
+      <div class="api-input-wrap">
+        <input type="password" id="api-sendgrid" placeholder="Paste your SendGrid API key here" />
+        <button class="toggle-vis" onclick="toggleVis('api-sendgrid', this)">Show</button>
+      </div>
+      <div class="field-hint">Found in SendGrid: Settings → API Keys → Create API Key (select "Full Access")</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Email address emails should be sent FROM</label>
+      <input type="email" id="sendgrid-from" placeholder="e.g. info@yourclinic.com or appointments@yourclinic.com" />
+      <div class="field-hint">Your engineer will authenticate this address so emails arrive from your clinic domain.</div>
+    </div>
+  </div>
+
+  <!-- ANTHROPIC CLAUDE API -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">Anthropic Claude API</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">anthropic.com · ~$25–100 USD/month estimated</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">The Claude API powers the intelligent reasoning layer of IntakeOS. After each patient call, Claude reads the full transcript and automatically generates a Pre-Consultation Brief for your staff — extracting the patient's procedure interest, qualifying answers, financing questions, and key concerns. This brief arrives in your staff's inbox before the patient walks in, so the consultation starts with context. Claude also handles complex conversation routing and follow-up message generation. For US clinic clients, Anthropic offers a Business Associate Agreement (BAA) for HIPAA compliance.</p>
+    <a class="platform-signup" href="https://anthropic.com" target="_blank">→ Subscribe at anthropic.com/api</a>
+    <div class="api-field field">
+      <label class="field-label">Anthropic API Key</label>
+      <div class="api-input-wrap">
+        <input type="password" id="api-anthropic" placeholder="Paste your Anthropic API key here" />
+        <button class="toggle-vis" onclick="toggleVis('api-anthropic', this)">Show</button>
+      </div>
+      <div class="field-hint">Found in Anthropic Console: console.anthropic.com → API Keys</div>
+    </div>
+  </div>
+
+  <!-- CAL.COM -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div>
+        <div class="platform-name">Cal.com (Self-Hosted)</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">cal.com · $0 — runs on your private server</div>
+      </div>
+      <span class="platform-badge badge-required">Required</span>
+    </div>
+    <p class="platform-desc">Cal.com is the scheduling engine that manages your consultation calendar. It is self-hosted — meaning it runs on your own private server at no additional subscription cost. The AI agent queries Cal.com in real time during phone conversations to offer available consultation slots, and books directly into your calendar when a patient confirms. You own all calendar data. Your engineer deploys and configures Cal.com as part of the setup — no account creation required from you for this platform.</p>
+    <div class="info-box" style="margin-top:12px; margin-bottom:0;">
+      <div class="info-box-title">No subscription or API key required</div>
+      <p>Cal.com is deployed by your engineer on your private server. No account creation, no monthly fee. Your engineer handles this entirely during setup.</p>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:20px;">
+    <label class="field-label">Do you currently use a different booking or scheduling system?</label>
+    <input type="text" id="alt-booking" placeholder="e.g. Jane App, Cliniko, Acuity, internal system — or 'No'" />
+    <div class="field-hint">If yes, Cal.com will run alongside your existing system. A custom integration to push bookings into your existing system is available — ask us for a quote.</div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(6)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 6 — BILLING
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-6">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 6 of 7</div>
+    <h2>Billing Setup</h2>
+    <p>IntakeOS charges $150 USD per verified attended consultation. Billing is managed by Stripe and charged automatically per confirmed attendance.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">How billing works</div>
+    <p>
+      <strong>$0 setup fee.</strong> You are never charged until a patient attends a consultation that IntakeOS booked.<br/><br/>
+      <strong>$150 USD per attended consultation.</strong> Two hours after each scheduled consultation, IntakeOS prompts your clinic to confirm patient attendance. Once confirmed, a charge of $150 USD is automatically processed to the card on file via Stripe.<br/><br/>
+      <strong>$100 USD monthly minimum.</strong> If fewer than one attended consultation occurs in a calendar month, a $100 USD minimum retainer applies.<br/><br/>
+      <strong>No invoicing.</strong> Every charge is automatic and per-event — no monthly billing cycles, no surprises.
+    </p>
+  </div>
+
+  <div class="stripe-section">
+    <div class="stripe-logo">Powered by Stripe</div>
+    <h4>Payment Method</h4>
+    <p>Your card is stored securely by Stripe. ArbitrageClaw / IntakeOS never stores or sees your full card number. Charges appear as <strong>IntakeOS · ArbitrageClaw</strong> on your statement.</p>
+
+    <div class="field">
+      <label class="field-label">Cardholder Name <span class="req">*</span></label>
+      <input type="text" id="card-name" placeholder="Name as it appears on card" />
+      <div class="field-error" id="err-card-name">Required.</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Card Number <span class="req">*</span></label>
+      <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" />
+      <div class="card-icons">
+        <span class="card-icon">VISA</span>
+        <span class="card-icon">MC</span>
+        <span class="card-icon">AMEX</span>
+      </div>
+      <div class="field-error" id="err-card-number">Enter a valid card number.</div>
+    </div>
+
+    <div class="card-row">
+      <div class="field" style="margin-bottom:0">
+        <label class="field-label">Expiry Date <span class="req">*</span></label>
+        <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" />
+        <div class="field-error" id="err-card-expiry">Required.</div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="field-label">CVV <span class="req">*</span></label>
+        <input type="password" id="card-cvv" placeholder="•••" maxlength="4" />
+        <div class="field-error" id="err-card-cvv">Required.</div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <label class="field-label">Billing Email (for receipts) <span class="req">*</span></label>
+      <input type="email" id="billing-email" placeholder="billing@yourclinic.com" />
+      <div class="field-error" id="err-billing-email">Enter a valid email.</div>
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <p>⚠️ <strong>Attendance confirmation is required before any charge is processed.</strong> IntakeOS will only trigger a billing event after your designated contact confirms that the patient attended the consultation. No charge is ever made for no-shows, cancellations, or unattended appointments.</p>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(5)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(7)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION 7 — REVIEW & LEGAL
+═══════════════════════════════════════ -->
+<div class="form-section" id="section-7">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 7 of 7</div>
+    <h2>Review & Agreement</h2>
+    <p>Please read and confirm the following before submitting your onboarding.</p>
+  </div>
+
+  <div class="legal-box">
+    <h4>Terms, Policies & Service Agreement</h4>
+
+    <div class="legal-item">
+      <input type="checkbox" id="agree-sla" />
+      <div class="legal-item-text">
+        I have read and agree to the <a href="#" onclick="openModal('sla'); return false;">IntakeOS Service Level Agreement (SLA)</a>
+        <small>Covers uptime commitments, response time guarantees, and support obligations.</small>
+      </div>
+    </div>
+
+    <div class="legal-item">
+      <input type="checkbox" id="agree-privacy" />
+      <div class="legal-item-text">
+        I have read and agree to the <a href="#" onclick="openModal('privacy'); return false;">IntakeOS Privacy Policy</a>
+        <small>Covers how patient data is collected, stored, and protected under HIPAA (US) and PIPA (Canada).</small>
+      </div>
+    </div>
+
+    <div class="legal-item">
+      <input type="checkbox" id="agree-terms" />
+      <div class="legal-item-text">
+        I have read and agree to the <a href="#" onclick="openModal('terms'); return false;">IntakeOS Terms & Conditions</a>
+        <small>Covers billing terms, cancellation policy, liability limitations, and performance-based fee structure.</small>
+      </div>
+    </div>
+
+    <div class="legal-item">
+      <input type="checkbox" id="agree-attendance" />
+      <div class="legal-item-text">
+        I understand that my clinic is responsible for confirming patient attendance within 2 hours of the scheduled consultation time. A $150 USD charge will be triggered upon confirmation of attendance.
+        <small>Non-response within 4 hours may result in a follow-up prompt. Charges are never automatic without confirmation.</small>
+      </div>
+    </div>
+
+    <div class="legal-item">
+      <input type="checkbox" id="agree-billing" />
+      <div class="legal-item-text">
+        I authorize IntakeOS / ArbitrageClaw to charge the card on file at $150 USD per confirmed attended consultation, and $100 USD/month minimum when applicable.
+      </div>
+    </div>
+  </div>
+  <div class="field-error" id="err-legal" style="margin-bottom:16px;">Please confirm all items above before submitting.</div>
+
+  <div class="form-nav">
+    <button class="btn btn-ghost" onclick="goTo(6)">← Back</button>
+    <button class="btn btn-submit" onclick="submitForm()">Submit Onboarding →</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success-screen">
+  <div class="success-icon">✓</div>
+  <h2>Onboarding received.</h2>
+  <p>Our team will review your clinic profile and be in touch within one business day to confirm activation.</p>
+  <div class="next-steps">
+    <h4>What happens next</h4>
+    <div class="nsi"><div class="nsi-num">1</div><div>Our team reviews your Soul Profile and Heartbeat configuration and assigns your account.</div></div>
+    <div class="nsi"><div class="nsi-num">2</div><div>IntakeOS is configured with your hours, agent identity, procedures, and qualifying logic.</div></div>
+    <div class="nsi"><div class="nsi-num">3</div><div>We run a test call to your clinic number to confirm everything works exactly as configured.</div></div>
+    <div class="nsi"><div class="nsi-num">4</div><div>You receive a go-live confirmation. IntakeOS is now active on your phone line and web form.</div></div>
+  </div>
+</div>
+
+</main>
+
+<!-- ═══════════════════════════════
+     MODALS — SLA / PRIVACY / TERMS
+═══════════════════════════════ -->
+<div class="modal-overlay" id="modal-sla">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('sla')">&times;</button>
+    <h3>Service Level Agreement</h3>
+    <div class="modal-body">
+      <h4>1. Uptime Commitment</h4>
+      <p>IntakeOS commits to 99.5% monthly uptime for voice and web form handling services. Planned maintenance will be communicated at least 24 hours in advance and scheduled outside peak clinic hours.</p>
+      <h4>2. Response Time Guarantees</h4>
+      <p>Inbound web form inquiries will receive an automated response within 15 seconds. Inbound phone calls will be answered within 3 rings during clinic hours and immediately after hours.</p>
+      <h4>3. Support</h4>
+      <p>Support requests submitted to operations@go.arbitrageclaw.net will receive a first response within one business day. Critical issues affecting live call handling will be escalated within 4 hours.</p>
+      <h4>4. Data & Audit Trail</h4>
+      <p>All patient interactions handled by IntakeOS are logged with full timestamps. Logs are retained for a minimum of 12 months and are accessible upon request.</p>
+      <h4>5. Termination</h4>
+      <p>Either party may terminate the service agreement with 30 days written notice. No termination fee applies. Pending consultation charges remain due upon termination.</p>
+      <p style="margin-top:18px; font-size:0.75rem; color:var(--muted);">Last updated: June 2026. Governed by the laws of British Columbia, Canada. Arbitrage Claw · 1008275 B.C. Ltd.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-privacy">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('privacy')">&times;</button>
+    <h3>Privacy Policy</h3>
+    <div class="modal-body">
+      <h4>1. Data We Collect</h4>
+      <p>IntakeOS collects patient name, phone number, email address, procedure interest, and qualification responses during AI-handled conversations. This data is used solely to book and manage consultations on behalf of your clinic.</p>
+      <h4>2. Data Storage</h4>
+      <p>All patient data is stored on encrypted servers located in Canada or the United States. Data is never sold, shared, or used for any purpose other than the operation of IntakeOS for your clinic.</p>
+      <h4>3. HIPAA Compliance (United States)</h4>
+      <p>IntakeOS operates in compliance with the Health Insurance Portability and Accountability Act. All patient health information is treated as Protected Health Information (PHI) and handled accordingly.</p>
+      <h4>4. PIPA Compliance (Canada)</h4>
+      <p>IntakeOS complies with the Personal Information Protection Act (British Columbia) and PIPEDA at the federal level. Patient data is collected with consent and retained only as long as necessary.</p>
+      <h4>5. Clinic Data Ownership</h4>
+      <p>Your clinic owns all patient data collected through IntakeOS. Upon termination of service, all data will be exported and delivered to you within 14 business days, then permanently deleted from our systems.</p>
+      <p style="margin-top:18px; font-size:0.75rem; color:var(--muted);">Last updated: June 2026. Arbitrage Claw · 1008275 B.C. Ltd.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-terms">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('terms')">&times;</button>
+    <h3>Terms & Conditions</h3>
+    <div class="modal-body">
+      <h4>1. Service Fee Structure</h4>
+      <p>The fee for IntakeOS is $150 USD per verified attended consultation. A monthly minimum of $100 USD applies when fewer consultations are attended in a given calendar month. There is no setup fee.</p>
+      <h4>2. Billing Trigger</h4>
+      <p>A charge of $150 USD is triggered only after a designated clinic contact confirms patient attendance via the IntakeOS attendance confirmation prompt. No charge is processed for no-shows, cancellations, or unconfirmed appointments.</p>
+      <h4>3. Monthly Minimum</h4>
+      <p>If total attendance-based charges for a calendar month are less than $100 USD, a minimum retainer charge of $100 USD will be applied on the last day of that month.</p>
+      <h4>4. Payment Authorization</h4>
+      <p>By providing a payment method, you authorize ArbitrageClaw / IntakeOS to charge the card on file for all fees incurred under this agreement.</p>
+      <h4>5. Cancellation</h4>
+      <p>Either party may cancel the agreement with 30 days written notice. All charges incurred prior to cancellation remain due.</p>
+      <h4>6. Limitation of Liability</h4>
+      <p>IntakeOS is responsible for managing the intake and booking process only. Clinical decisions, consultations, and outcomes remain solely the responsibility of the clinic.</p>
+      <p style="margin-top:18px; font-size:0.75rem; color:var(--muted);">Last updated: June 2026. Governed by British Columbia, Canada law. Arbitrage Claw · 1008275 B.C. Ltd.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── HOURS GRID ──
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const grid = document.getElementById('hours-grid');
+  days.forEach(day => {
+    const row = document.createElement('div');
+    row.className = 'hours-row';
+    const isClosed = day === 'Sunday';
+    row.innerHTML = `
+      <span class="day-label">${day}</span>
+      <input type="time" id="open-${day}" value="${['Saturday','Sunday'].includes(day) ? '' : '08:00'}" ${isClosed ? 'disabled style="opacity:0.4"' : ''} />
+      <input type="time" id="close-${day}" value="${['Saturday','Sunday'].includes(day) ? '' : '17:00'}" ${isClosed ? 'disabled style="opacity:0.4"' : ''} />
+      <label class="closed-wrap"><input type="checkbox" id="closed-${day}" ${isClosed ? 'checked' : ''} onchange="toggleDay('${day}')" /> Closed</label>
+    `;
+    grid.appendChild(row);
+  });
+
+  function toggleDay(day) {
+    const closed = document.getElementById(`closed-${day}`).checked;
+    ['open','close'].forEach(t => {
+      const el = document.getElementById(`${t}-${day}`);
+      el.disabled = closed;
+      el.style.opacity = closed ? '0.4' : '1';
+    });
+  }
+
+  // ── ADD PROCEDURE ──
+  function addProcedure() {
+    const list = document.getElementById('procedures-list');
+    const div = document.createElement('div');
+    div.className = 'procedure-entry';
+    div.style.marginBottom = '12px';
+    div.innerHTML = `
+      <div class="two-col" style="margin-bottom:8px;">
+        <div class="field" style="margin-bottom:0"><label class="field-label">Procedure Name</label><input type="text" class="proc-name" placeholder="e.g. Hair Transplant" /></div>
+        <div class="field" style="margin-bottom:0"><label class="field-label">Consultation Fee</label><input type="text" class="proc-fee" placeholder="e.g. complimentary" /></div>
+      </div>
+      <div class="field" style="margin-bottom:0"><label class="field-label">Key qualifying question</label><input type="text" class="proc-qualify" placeholder="e.g. How long have you been experiencing hair loss?" /></div>
+    `;
+    list.appendChild(div);
+  }
+
+  // ── TOGGLE API KEY VISIBILITY ──
+  function toggleVis(id, btn) {
+    const el = document.getElementById(id);
+    if (el.type === 'password') { el.type = 'text'; btn.textContent = 'Hide'; }
+    else { el.type = 'password'; btn.textContent = 'Show'; }
+  }
+
+  // ── CARD FORMATTING ──
+  function formatCard(el) {
+    let v = el.value.replace(/\D/g,'').substring(0,16);
+    el.value = v.match(/.{1,4}/g)?.join(' ') || v;
+  }
+  function formatExpiry(el) {
+    let v = el.value.replace(/\D/g,'').substring(0,4);
+    if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2);
+    el.value = v;
+  }
+
+  // ── MODAL ──
+  function openModal(name) {
+    document.getElementById(`modal-${name}`).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(name) {
+    document.getElementById(`modal-${name}`).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) { m.classList.remove('open'); document.body.style.overflow = ''; } });
+  });
+
+  // ── NAVIGATION ──
+  let current = 1;
+  function goTo(n) {
+    if (n > current && !validateSection(current)) return;
+    document.getElementById(`section-${current}`).classList.remove('active');
+    const prevStep = document.getElementById(`step-${current}`);
+    prevStep.classList.remove('active');
+    if (n > current) prevStep.classList.add('done');
+    else prevStep.classList.remove('done');
+    current = n;
+    document.getElementById(`section-${n}`).classList.add('active');
+    document.getElementById(`step-${n}`).classList.add('active');
+    document.getElementById(`step-${n}`).classList.remove('done');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── VALIDATION ──
+  function validateSection(n) {
+    let valid = true;
+    function req(id, errId, fn) {
+      const el = document.getElementById(id);
+      const err = document.getElementById(errId);
+      const ok = fn ? fn(el) : (el && el.value.trim() !== '');
+      if (el) el.classList.toggle('error', !ok);
+      if (err) err.classList.toggle('show', !ok);
+      if (!ok) valid = false;
+    }
+    function reqGroup(name, errId) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      const err = document.getElementById(errId);
+      if (err) err.classList.toggle('show', !checked);
+      if (!checked) valid = false;
+    }
+    function reqChecks(groupId, errId) {
+      const checked = document.querySelectorAll(`#${groupId} input:checked`);
+      const err = document.getElementById(errId);
+      if (err) err.classList.toggle('show', checked.length === 0);
+      if (checked.length === 0) valid = false;
+    }
+
+    if (n === 1) {
+      req('clinic-name','err-clinic-name');
+      req('contact-name','err-contact-name');
+      req('contact-email','err-contact-email', el => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value));
+      req('contact-phone','err-contact-phone');
+      req('contact-city','err-contact-city');
+      req('contact-country','err-contact-country');
+      req('clinic-phone','err-clinic-phone');
+      reqChecks('specialty-group','err-specialty');
+    }
+    if (n === 3) {
+      req('agent-name','err-agent-name');
+      req('agent-intro','err-agent-intro');
+      reqGroup('tone','err-tone');
+    }
+    if (n === 4) {
+      reqGroup('booking-mode','err-booking-mode');
+      req('qualify-rules','err-qualify-rules');
+      req('attendance-email','err-attendance-email', el => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value));
+    }
+    if (n === 6) {
+      req('card-name','err-card-name');
+      req('card-number','err-card-number', el => el.value.replace(/\s/g,'').length >= 15);
+      req('card-expiry','err-card-expiry');
+      req('card-cvv','err-card-cvv');
+      req('billing-email','err-billing-email', el => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value));
+    }
+    return valid;
+  }
+
+  // ── SUBMIT ──
+  function submitForm() {
+    const checks = ['agree-sla','agree-privacy','agree-terms','agree-attendance','agree-billing'];
+    const allChecked = checks.every(id => document.getElementById(id).checked);
+    const err = document.getElementById('err-legal');
+    err.classList.toggle('show', !allChecked);
+    if (!allChecked) return;
+
+    const specialties = [...document.querySelectorAll('#specialty-group input:checked')].map(i=>i.value).join(', ');
+    let hoursText = '';
+    days.forEach(d => {
+      const closed = document.getElementById(`closed-${d}`).checked;
+      hoursText += `${d}: ${closed ? 'Closed' : document.getElementById(`open-${d}`).value + ' – ' + document.getElementById(`close-${d}`).value}\n`;
+    });
+    const procs = [...document.querySelectorAll('.procedure-entry')].map(e => {
+      const n = e.querySelector('.proc-name')?.value || '';
+      const f = e.querySelector('.proc-fee')?.value || '';
+      const q = e.querySelector('.proc-qualify')?.value || '';
+      return n ? `  • ${n} | Fee: ${f} | Qualifying Q: ${q}` : null;
+    }).filter(Boolean).join('\n');
+
+    const body = `
+INTAKEOS CLINIC ONBOARDING
+==========================
+
+SECTION 1 — CLINIC INFORMATION
+Clinic Legal Name: ${v('clinic-name')}
+Specialty: ${specialties}
+Website: ${v('clinic-url') || 'N/A'}
+Contact Name: ${v('contact-name')}
+Role: ${v('contact-role') || 'N/A'}
+Email: ${v('contact-email')}
+Phone: ${v('contact-phone')}
+City: ${v('contact-city')}
+Country: ${v('contact-country')}
+Clinic Phone for IntakeOS: ${v('clinic-phone')}
+
+SECTION 2 — HOURS OF OPERATION
+${hoursText}After-Hours: ${document.querySelector('input[name="after-hours"]:checked')?.value || 'Not specified'}
+
+SECTION 3 — SOUL PROFILE
+Agent Name: ${v('agent-name')}
+Agent Title: ${v('agent-title') || 'N/A'}
+Introduction Script: ${v('agent-intro')}
+Tone: ${document.querySelector('input[name="tone"]:checked')?.value || 'N/A'}
+Always Use: ${v('words-always') || 'N/A'}
+Never Use: ${v('words-never') || 'N/A'}
+Primary Language: ${v('lang-primary')}
+Secondary Language: ${v('lang-secondary') || 'N/A'}
+
+SECTION 4 — HEARTBEAT
+Procedures:
+${procs || 'Not specified'}
+Booking Mode: ${document.querySelector('input[name="booking-mode"]:checked')?.value || 'N/A'}
+Qualification Rules: ${v('qualify-rules')}
+Financing Options: ${v('financing') || 'N/A'}
+FAQs: ${v('faqs') || 'N/A'}
+Attendance Confirmation Email: ${v('attendance-email')}
+No-Show Rebook Channel: ${document.querySelector('input[name="rebook-channel"]:checked')?.value || 'N/A'}
+
+SECTION 5 — PLATFORM SUBSCRIPTIONS
+[API keys submitted securely — not included in email]
+GHL Location ID: ${v('api-ghl-location') || 'N/A'}
+SendGrid From Email: ${v('sendgrid-from') || 'N/A'}
+Alt Booking System: ${v('alt-booking') || 'N/A'}
+
+SECTION 6 — BILLING
+Cardholder Name: ${v('card-name')}
+Billing Email: ${v('billing-email')}
+[Card details submitted securely via Stripe — not included in email]
+
+LEGAL AGREEMENTS CONFIRMED: SLA ✓ | Privacy Policy ✓ | Terms & Conditions ✓ | Attendance Billing ✓ | Payment Authorization ✓
+    `.trim();
+
+    const subject = encodeURIComponent(`IntakeOS Onboarding — ${v('clinic-name')}`);
+    window.location.href = `mailto:operations@go.arbitrageclaw.net?subject=${subject}&body=${encodeURIComponent(body)}`;
+
+    document.getElementById(`section-7`).classList.remove('active');
+    document.getElementById(`step-7`).classList.add('done');
+    document.getElementById('success-screen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+</script>
+</body>
+</html>
