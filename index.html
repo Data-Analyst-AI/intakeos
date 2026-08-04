@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IntakeOS — AI-Powered Patient Intake</title>
-  <meta name="description" content="IntakeOS replaces missed calls with an AI voice agent that captures leads, books consultations, and recovers no-shows 24/7. HIPAA & PIPA compliant." />
+  <title>IntakeOS Medical — Managed Patient Intake for Elective Practices</title>
+  <meta name="description" content="IntakeOS responds to patient inquiries, qualifies prospective patients, books consultations, and recovers no-shows for elective medical practices." />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,25 +37,16 @@
     html { scroll-behavior: smooth; }
     body { background-color: #F8FAFC; color: #1E293B; }
 
-    /* ── Headline accent ── */
-    .text-accent {
-      color: #5F97C5;
-    }
+    .text-accent { color: #5F97C5; }
 
-    /* ── Thin section divider ── */
-    .divider {
-      height: 1px;
-      background: #E2E8F0;
-    }
+    .divider { height: 1px; background: #E2E8F0; }
 
-    /* ── Nav ── */
     .nav-surface {
       background: rgba(248,250,252,0.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid #E2E8F0;
     }
 
-    /* ── Mobile menu ── */
     #mobile-menu {
       max-height: 0;
       overflow: hidden;
@@ -72,7 +63,6 @@
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
 
-    /* ── Primary button ── */
     .btn-primary {
       background: #5F97C5;
       color: #fff;
@@ -84,7 +74,6 @@
       box-shadow: 0 6px 20px rgba(95,151,197,0.28);
     }
 
-    /* ── Ghost button ── */
     .btn-ghost {
       border: 1px solid #E2E8F0;
       color: #64748B;
@@ -97,14 +86,12 @@
       background: #EBF3FB;
     }
 
-    /* ── Compliance badge ── */
     .badge {
       border: 1px solid #B8D4EC;
       background: #EBF3FB;
       color: #4A82B0;
     }
 
-    /* ── Card ── */
     .card {
       background: #fff;
       border: 1px solid #E2E8F0;
@@ -116,7 +103,6 @@
       transform: translateY(-2px);
     }
 
-    /* ── Step number ── */
     .step-num {
       width: 38px; height: 38px; flex-shrink: 0;
       border: 1px solid #B8D4EC;
@@ -128,10 +114,8 @@
       background: #EBF3FB;
     }
 
-    /* ── Stat accent ── */
     .stat-bar { border-left: 2px solid #5F97C5; }
 
-    /* ── Specialty pill ── */
     .pill {
       border: 1px solid #E2E8F0;
       color: #64748B;
@@ -145,7 +129,6 @@
       transform: translateY(-1px);
     }
 
-    /* ── Feature icon dot ── */
     .icon-dot {
       width: 36px; height: 36px;
       background: #EBF3FB;
@@ -156,7 +139,6 @@
       flex-shrink: 0;
     }
 
-    /* ── Hero fade-up ── */
     @keyframes fade-up {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -167,7 +149,6 @@
     .d3 { animation-delay: 0.35s; opacity: 0; }
     .d4 { animation-delay: 0.5s;  opacity: 0; }
 
-    /* ── Scroll reveal ── */
     .reveal {
       opacity: 0;
       transform: translateY(22px);
@@ -175,23 +156,9 @@
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    /* ── Live dot ── */
-    @keyframes live-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(1.5); }
-    }
-    .live-dot {
-      width: 7px; height: 7px;
-      background: #22c55e;
-      border-radius: 50%;
-      animation: live-pulse 2.2s ease-in-out infinite;
-    }
-
-    /* ── Pricing row ── */
     .price-row { border-bottom: 1px solid #E2E8F0; }
     .price-row:last-of-type { border-bottom: none; }
 
-    /* ── Hero subtle background pattern ── */
     .hero-bg {
       background-color: #F8FAFC;
       background-image:
@@ -202,9 +169,7 @@
 </head>
 <body class="font-sans antialiased">
 
-  <!-- ══════════════════════════════════
-       NAV
-  ══════════════════════════════════ -->
+  <!-- NAV -->
   <nav class="nav-surface fixed top-0 left-0 right-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
@@ -222,7 +187,7 @@
 
         <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
            class="hidden md:inline-block btn-primary px-5 py-2.5 rounded-lg text-sm font-medium">
-          Get Started Now
+          Request Practice Review
         </button>
 
         <button id="hamburger-btn" class="hamburger md:hidden flex flex-col gap-1.5 p-1" aria-label="Open menu">
@@ -245,46 +210,36 @@
     </div>
   </nav>
 
-  <!-- ══════════════════════════════════
-       HERO
-  ══════════════════════════════════ -->
+  <!-- HERO -->
   <section class="hero-bg min-h-screen flex items-center pt-20">
     <div class="max-w-5xl mx-auto px-6 py-24 text-center">
 
-      <!-- Headline -->
       <h1 class="fade-up d1 font-display text-5xl md:text-7xl text-ink leading-tight mb-7">
-        Your clinic responds in<br/>
-        <span class="text-accent">15 seconds.</span><br/>
+         Every patient receives<br/>
+        <span class="text-accent">immediate attention.</span><br/>
         Every time.
       </h1>
 
-      <!-- Video embed -->
-      <div class="fade-up d2 w-full max-w-3xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-lg">
+      <p class="fade-up d2 text-muted text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed mb-4">
+          Every phone call and web inquiry is handled immediately by IntakeOS — no voicemail, no hold time, and no waiting for a callback.
+      </p>
+
+      <p class="fade-up d2 text-muted text-base md:text-lg font-light max-w-2xl mx-auto leading-relaxed mb-10">
+        Prospective patients are qualified using your practice's criteria, guided into a booked consultation, and followed up if they do not attend — so your staff can stay focused on qualified, high-intent patients.
+      </p>
+
+      <div class="fade-up d3 w-full max-w-3xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-lg">
         <iframe width="100%" height="480"
           src="https://www.youtube.com/embed/1xuQE-RfaZk"
-          title="IntakeOS Demo Video"
+          title="IntakeOS — Managed Patient Intake"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
 
-      <!-- Subheadline -->
-      <p class="fade-up d3 text-muted text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed mb-11">
-        IntakeOS responds to patient inquiries after hours, on weekends, through web forms 24/7, and on overflow calls when your staff cannot answer.
-        It qualifies prospective patients using your practice’s criteria, books suitable consultations directly into your calendar, and follows up to recover no-shows.
-        Your staff spends less time chasing inquiries and more time supporting qualified, high-intent patients.
-      </p>
-
-      <!-- Trust line -->
-      <div class="fade-up d3 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <p class="text-muted/60 text-sm font-light">$0 setup. $150 per verified attended consultation. A $100 monthly minimum applies only when there are no attended consultations.
-      </p>
-        <span class="hidden sm:block text-border">|</span>
-        <div class="flex items-center gap-2">
-          <div class="live-dot"></div>
-          <span class="text-muted/60 text-xs font-light">AI agent online 24/7</span>
-        </div>
+      <div class="fade-up d4 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <p class="text-muted/60 text-sm font-light">$0 setup · Performance-based pricing</p>
       </div>
 
     </div>
@@ -292,26 +247,24 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       SOCIAL PROOF STATS
-  ══════════════════════════════════ -->
+  <!-- PROBLEM / COST / FIX -->
   <section class="py-20 bg-canvas">
     <div class="max-w-6xl mx-auto px-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
 
         <div class="stat-bar pl-5 reveal">
           <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The problem</p>
-          <p class="text-ink text-base font-light leading-relaxed">The average clinic loses 90% of web leads because they respond 47 hours too late.</p>
+          <p class="text-ink text-base font-light leading-relaxed">High-intent inquiries often arrive after hours, on weekends, or when staff are already assisting other patients.</p>
         </div>
 
         <div class="stat-bar pl-5 reveal" style="transition-delay:.1s">
           <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The cost</p>
-          <p class="text-ink text-base font-light leading-relaxed">Every no-show is $200+ gone. Every lost fertility lead is $15,000 to your competitor.</p>
+          <p class="text-ink text-base font-light leading-relaxed">Slow follow-up gives prospective patients time to continue searching and contact a faster practice.</p>
         </div>
 
         <div class="stat-bar pl-5 reveal sm:col-span-2 md:col-span-1" style="transition-delay:.2s">
           <p class="text-xs font-medium uppercase tracking-widest text-accent mb-2">The fix</p>
-          <p class="text-ink text-base font-light leading-relaxed">IntakeOS responds in 15 seconds. Every time. No staff required.</p>
+          <p class="text-ink text-base font-light leading-relaxed">IntakeOS engages each inquiry immediately, qualifies the prospective patient, books suitable consultations, and follows up when rebooking is needed.</p>
         </div>
 
       </div>
@@ -320,9 +273,7 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       HOW IT WORKS
-  ══════════════════════════════════ -->
+  <!-- HOW IT WORKS -->
   <section id="how-it-works" class="py-24 bg-white">
     <div class="max-w-4xl mx-auto px-6">
 
@@ -337,27 +288,27 @@
           <div class="step-num">01</div>
           <div>
             <h3 class="font-display text-xl md:text-2xl text-ink mb-2">A potential patient reaches out</h3>
-            <p class="text-muted font-light leading-relaxed text-sm md:text-base mb-4">IntakeOS activates in three scenarios — every inquiry is captured, every time.</p>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base mb-4"> IntakeOS provides immediate patient intake across three scenarios, ensuring inquiries are handled without waiting for staff availability.</p>
             <div class="space-y-3">
               <div class="flex gap-3 items-start">
                 <span class="text-accent text-base mt-0.5 flex-shrink-0">🌙</span>
                 <div>
                   <p class="text-ink text-sm font-medium">Evenings &amp; Weekends</p>
-                  <p class="text-muted text-sm font-light leading-relaxed">When your clinic is closed, IntakeOS handles every inquiry autonomously — no staff needed.</p>
+                  <p class="text-muted text-sm font-light leading-relaxed">When your clinic is closed, IntakeOS handles every inquiry without staff involvement.</p>
                 </div>
               </div>
               <div class="flex gap-3 items-start">
                 <span class="text-accent text-base mt-0.5 flex-shrink-0">🌐</span>
                 <div>
                   <p class="text-ink text-sm font-medium">Web Form Inquiries — 24/7</p>
-                  <p class="text-muted text-sm font-light leading-relaxed">Every form submission receives a personalized response in under 15 seconds, around the clock, every day of the year.</p>
+                  <p class="text-muted text-sm font-light leading-relaxed">Web form submissions are designed to receive a personalized response in under 15 seconds, around the cloc</p>
                 </div>
               </div>
               <div class="flex gap-3 items-start">
                 <span class="text-accent text-base mt-0.5 flex-shrink-0">📞</span>
                 <div>
                   <p class="text-ink text-sm font-medium">Overflow Trigger — After 3 Rings</p>
-                  <p class="text-muted text-sm font-light leading-relaxed">Inbound calls ring your staff first. If no one answers after 3 rings — because your team is already speaking with other patients — IntakeOS takes over instantly. No voicemail. No lost lead. No callback chase.</p>
+                  <p class="text-muted text-sm font-light leading-relaxed">Inbound calls ring your staff first. If no one answers after 3 rings — because your team is already speaking with other patients — IntakeOS takes over instantly. No voicemail delay. No unnecessary callback chase.</p>
                 </div>
               </div>
             </div>
@@ -368,7 +319,7 @@
           <div class="step-num">02</div>
           <div>
             <h3 class="font-display text-xl md:text-2xl text-ink mb-2">IntakeOS qualifies and books — without staff involvement</h3>
-            <p class="text-muted font-light leading-relaxed text-sm md:text-base">Our AI conducts a natural qualifying conversation, answers financing questions, and books the consultation directly into the doctor's calendar. It sends confirmation by SMS and email within 60 seconds. Your staff receive a Pre-Consultation Brief before the patient arrives — procedure interest, financing questions, and key concerns already documented.</p>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base">IntakeOS conducts a natural qualifying conversation using your practice's own criteria, answers financing questions, and books the consultation directly into the doctor's calendar. A confirmation is sent by SMS and email. Your staff receive a Pre-Consultation Brief before the patient arrives — procedure interest, financing questions, and key concerns already documented.</p>
           </div>
         </div>
 
@@ -376,10 +327,10 @@
           <div class="step-num">03</div>
           <div>
             <h3 class="font-display text-xl md:text-2xl text-ink mb-2">Reminders, no-show recovery — then you meet your patient</h3>
-            <p class="text-muted font-light leading-relaxed text-sm md:text-base mb-3">IntakeOS sends reminders at 48 hours and on the day of the appointment. If a patient doesn't show, an automated recovery workflow fires immediately — a warm follow-up text and call to rebook.</p>
+            <p class="text-muted font-light leading-relaxed text-sm md:text-base mb-3">IntakeOS sends reminders at 48 hours and on the day of the appointment. If a patient does not attend, a recovery workflow follows up and offers to rebook.</p>
             <div class="flex items-start gap-3 bg-ice-light rounded-xl px-4 py-3">
               <span class="text-accent text-base mt-0.5 flex-shrink-0">✓</span>
-              <p class="text-muted text-sm font-light leading-relaxed"><strong class="text-ink font-medium">The human moment:</strong> IntakeOS manages every step from inquiry to booked consultation. The face-to-face consultation with your clinical team is 100% human. You're charged $150 USD only when a qualified patient walks through your door.</p>
+              <p class="text-muted text-sm font-light leading-relaxed"><strong class="text-ink font-medium">The human moment:</strong> IntakeOS manages every step from inquiry to booked consultation. The face-to-face consultation with your clinical team is 100% human. You are charged $150 USD only when a qualified patient attends their scheduled appointment.</p>
             </div>
           </div>
         </div>
@@ -390,28 +341,26 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       SPECIALTIES
-  ══════════════════════════════════ -->
+  <!-- SPECIALTIES -->
   <section id="specialties" class="py-24 bg-canvas">
     <div class="max-w-6xl mx-auto px-6">
 
       <div class="text-center mb-14 reveal">
         <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Specialties</p>
         <h2 class="font-display text-3xl md:text-5xl text-ink mb-5">
-          Built for clinics where every consultation<br class="hidden md:block"/> is worth $4,000–$15,000
+          Built for elective practices where every<br class="hidden md:block"/> consultation opportunity matters.
         </h2>
         <p class="text-muted text-base md:text-lg font-light max-w-2xl mx-auto">
-          A missed LASIK lead is $5,000 gone. A lost fertility patient is $15,000 to a competitor down the street. IntakeOS makes sure that never happens again.
+          A missed inquiry can represent a high-value treatment opportunity lost to a faster practice.
         </p>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 reveal">
-        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">LASIK &amp; Ophthalmology</span>
-        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Fertility Clinics</span>
         <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Cosmetic Surgery</span>
-        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Hair Transplants</span>
-        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Aesthetic Clinics</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Fertility Clinics</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Hair Restoration</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Medical Aesthetics</span>
+        <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">LASIK &amp; Ophthalmology</span>
         <span class="pill px-4 py-3 rounded-xl text-sm font-medium text-center">Dental Implants</span>
       </div>
 
@@ -420,47 +369,46 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       WHY INTAKEOS
-  ══════════════════════════════════ -->
+  <!-- WHY INTAKEOS -->
   <section class="py-24 bg-white">
     <div class="max-w-6xl mx-auto px-6">
 
       <div class="text-center mb-16 reveal">
         <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Why IntakeOS</p>
         <h2 class="font-display text-4xl md:text-5xl text-ink">Not another chatbot.<br/>A complete intake system.</h2>
+        <p class="text-muted text-base font-light max-w-2xl mx-auto mt-4">Configured around your specialty, practice criteria, patient journey, and consultation calendar.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <div class="card rounded-2xl p-7 reveal">
-          <div class="icon-dot mb-5">$</div>
-          <h3 class="font-semibold text-ink text-base mb-2">Zero risk pricing</h3>
-          <p class="text-muted text-sm font-light leading-relaxed">No setup fee. $150 USD per attended consultation, with a $100 USD monthly minimum. Nothing more.</p>
+          <div class="icon-dot mb-5">🔒</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Designed for compliance</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Designed for HIPAA-compliant deployment in the United States and built around Canadian privacy and data-residency requirements. Compliance details are covered in the section below.</p>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.07s">
-          <div class="icon-dot mb-5">🔒</div>
-          <h3 class="font-semibold text-ink text-base mb-2">Full compliance</h3>
-          <p class="text-muted text-sm font-light leading-relaxed">HIPAA & PIPA compliant with NemoClaw audit logging. Built for regulated healthcare environments.</p>
+          <div class="icon-dot mb-5">🎙</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Managed intake — 24/7</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">IntakeOS responds in seconds. Handles evenings, weekends, web forms around the clock, and overflow calls after 3 rings. Books, reminds, and follows up on no-shows while your team focuses on patients.</p>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.14s">
-          <div class="icon-dot mb-5">🎙</div>
-          <h3 class="font-semibold text-ink text-base mb-2">24/7 AI voice agent</h3>
-          <p class="text-muted text-sm font-light leading-relaxed">Responds in 15 seconds. Handles evenings, weekends, web forms around the clock, and overflow calls after 3 rings. Books, reminds, and recovers no-shows while your team sleeps.</p>
+          <div class="icon-dot mb-5">🔗</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Dedicated infrastructure</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Your data, your system, your control. The clinic owns its server and its patient records.</p>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.21s">
-          <div class="icon-dot mb-5">🔗</div>
-          <h3 class="font-semibold text-ink text-base mb-2">No vendor lock-in</h3>
-          <p class="text-muted text-sm font-light leading-relaxed">Dedicated infrastructure. Your data, your system, your control.</p>
+          <div class="icon-dot mb-5">📋</div>
+          <h3 class="font-semibold text-ink text-base mb-2">Pre-Consultation Brief</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Before each appointment, your staff receive a documented summary of the patient's procedure interest, financing questions, and key concerns — so the consultation begins informed.</p>
         </div>
 
         <div class="card rounded-2xl p-7 reveal sm:col-span-2" style="transition-delay:.28s">
           <div class="icon-dot mb-5">⭐</div>
-          <h3 class="font-semibold text-ink text-base mb-2">Built for premium clinics</h3>
-          <p class="text-muted text-sm font-light leading-relaxed">Not a generic chatbot. Configured specifically for your specialty, your brand, and your patient profile. IntakeOS speaks the language of Beverly Hills — not a call center.</p>
+          <h3 class="font-semibold text-ink text-base mb-2">Built for premium elective practices</h3>
+          <p class="text-muted text-sm font-light leading-relaxed">Not a generic platform. IntakeOS is configured specifically for your specialty, your brand, your qualification criteria, and your patient profile. Every interaction reflects your practice — not a call centre.</p>
         </div>
 
       </div>
@@ -469,15 +417,13 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       PRICING
-  ══════════════════════════════════ -->
+  <!-- PRICING -->
   <section id="pricing" class="py-24 bg-canvas">
     <div class="max-w-xl mx-auto px-6">
 
       <div class="text-center mb-10 reveal">
         <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Pricing</p>
-        <h2 class="font-display text-4xl md:text-5xl text-ink">Simple pricing.<br/>Zero risk.</h2>
+        <h2 class="font-display text-4xl md:text-5xl text-ink">Simple pricing.<br/>Performance-based.</h2>
       </div>
 
       <div class="card rounded-2xl overflow-hidden reveal">
@@ -485,7 +431,7 @@
         <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
           <div>
             <p class="text-ink font-medium">Setup</p>
-            <p class="text-muted text-sm font-light mt-1">Full system configuration for your clinic</p>
+            <p class="text-muted text-sm font-light mt-1">Full system configuration for your practice</p>
           </div>
           <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
             $0 <span class="text-base font-sans text-muted">USD</span>
@@ -495,7 +441,7 @@
         <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
           <div>
             <p class="text-ink font-medium">Per verified attended consultation</p>
-            <p class="text-muted text-sm font-light mt-1">Charged only when the patient attends</p>
+            <p class="text-muted text-sm font-light mt-1">Charged only when the patient attends their appointment</p>
           </div>
           <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
             $150 <span class="text-base font-sans text-muted">USD</span>
@@ -505,7 +451,7 @@
         <div class="price-row flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-7 md:p-9">
           <div>
             <p class="text-ink font-medium">Monthly minimum</p>
-            <p class="text-muted text-sm font-light mt-1">Only applies if there are no attended consultations</p>
+            <p class="text-muted text-sm font-light mt-1">Applies only when zero consultations are attended during a calendar month</p>
           </div>
           <p class="font-display text-3xl text-ink sm:whitespace-nowrap">
             $100 <span class="text-base font-sans text-muted">USD</span>
@@ -514,8 +460,13 @@
 
         <div class="flex items-start gap-3 p-7 md:p-9 bg-ice-light">
           <span class="text-accent text-lg mt-0.5">✓</span>
-          <p class="text-muted text-sm font-light leading-relaxed">No setup cost. No risk. No charge applies to a no-show. If no consultations are attended during the month, the $100 monthly minimum keeps the service active.
-      </p>
+          <div class="text-muted text-sm font-light leading-relaxed space-y-1">
+            <p>$0 setup. No onboarding fee of any kind.</p>
+            <p>$150 per verified attended consultation — charged only when the patient attends.</p>
+            <p>If one or more consultations are attended during a calendar month, no additional monthly minimum applies.</p>
+            <p>If zero consultations are attended during a calendar month, the $100 monthly minimum keeps the service active.</p>
+            <p>No charge applies to an individual no-show.</p>
+          </div>
         </div>
 
       </div>
@@ -524,16 +475,14 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       COMPLIANCE
-  ══════════════════════════════════ -->
+  <!-- COMPLIANCE -->
   <section id="compliance" class="py-24 bg-white">
     <div class="max-w-6xl mx-auto px-6">
 
       <div class="text-center mb-16 reveal">
         <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">Compliance</p>
-        <h2 class="font-display text-4xl md:text-5xl text-ink mb-5">Built for regulated<br/>healthcare environments.</h2>
-        <p class="text-muted text-base md:text-lg font-light max-w-2xl mx-auto">Patient data in healthcare is not optional compliance — it is a legal obligation. IntakeOS was architected for it from day one.</p>
+        <h2 class="font-display text-4xl md:text-5xl text-ink mb-5">Designed for regulated<br/>healthcare environments.</h2>
+        <p class="text-muted text-base md:text-lg font-light max-w-2xl mx-auto">Patient data in healthcare is a legal obligation, not an afterthought. IntakeOS is designed with compliance requirements built into the deployment architecture from the start.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -543,8 +492,8 @@
             <div class="icon-dot">🇺🇸</div>
             <h3 class="font-semibold text-ink text-base">United States — HIPAA</h3>
           </div>
-          <p class="text-muted text-sm font-light leading-relaxed mb-3">All US clinic deployments operate on HIPAA-compliant hosting infrastructure. Business Associate Agreements (BAAs) are signed with every applicable platform vendor before any patient data is processed. No patient data is stored on shared or non-compliant infrastructure.</p>
-          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 HIPAA Compliant</span>
+          <p class="text-muted text-sm font-light leading-relaxed mb-3">US clinic deployments are designed for HIPAA-compliant infrastructure. US clinic deployments are designed for HIPAA-compliant infrastructure. Production environments, Business Associate Agreements, access controls, data handling, and infrastructure requirements are verified before any patient information is processed.</p>
+          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 Designed for HIPAA-Compliant Deployment</span>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.07s">
@@ -552,17 +501,17 @@
             <div class="icon-dot">🇨🇦</div>
             <h3 class="font-semibold text-ink text-base">Canada — PIPA &amp; PIPEDA</h3>
           </div>
-          <p class="text-muted text-sm font-light leading-relaxed mb-3">Canadian clinic deployments run on a private server physically located in Montreal, Canada. Patient data never leaves Canadian soil. This satisfies BC's Personal Information Protection Act (PIPA) and Canada's federal PIPEDA standard. The clinic is the data custodian — IntakeOS never has access to patient data.</p>
-          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 PIPA &amp; PIPEDA Compliant</span>
+          <p class="text-muted text-sm font-light leading-relaxed mb-3">Canadian clinic deployments are designed around BC's Personal Information Protection Act (PIPA) and Canada's federal PIPEDA standard. Canadian deployments use a private server physically located in Canada. Data residency and access controls are verified before patient information is processed. The clinic is the data custodian.</p>
+          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 Designed for Canadian Privacy Requirements</span>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.14s">
           <div class="flex items-center gap-3 mb-4">
             <div class="icon-dot">📋</div>
-            <h3 class="font-semibold text-ink text-base">NemoClaw Audit Logging</h3>
+            <h3 class="font-semibold text-ink text-base">Full Audit Trail</h3>
           </div>
-          <p class="text-muted text-sm font-light leading-relaxed mb-3">Every patient interaction, every automated message, every booking confirmation is logged in an append-only compliance audit trail by NemoClaw — the security layer running on the clinic's own server. Compliance reports can be generated on any interval required. The data belongs entirely to the clinic.</p>
-          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 Append-Only Audit Trail</span>
+          <p class="text-muted text-sm font-light leading-relaxed mb-3">Every patient interaction, automated message, and booking confirmation is logged in an append-only audit trail, powered by NemoClaw, running on the clinic's own server. Compliance reports can be generated on any interval required. The data belongs entirely to the clinic.</p>
+          <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 Append-Only Audit Logging</span>
         </div>
 
         <div class="card rounded-2xl p-7 reveal" style="transition-delay:.21s">
@@ -570,17 +519,16 @@
             <div class="icon-dot">🔐</div>
             <h3 class="font-semibold text-ink text-base">Infrastructure Security</h3>
           </div>
-          <p class="text-muted text-sm font-light leading-relaxed mb-3">All data in transit is protected with TLS 1.3 encryption. Network egress is restricted to a whitelist of 6 approved API endpoints — no unauthorized outbound connections are possible. The clinic owns its own server. There is no shared infrastructure and no vendor lock-in.</p>
+          <p class="text-muted text-sm font-light leading-relaxed mb-3">All data in transit is protected with TLS 1.3 encryption. Network egress is restricted to a defined set of approved API endpoints. The clinic owns its server. There is no shared infrastructure and no vendor lock-in.</p>
           <span class="badge px-3 py-1.5 rounded-full text-xs font-medium">🔒 TLS 1.3 Encrypted</span>
         </div>
 
       </div>
 
       <div class="flex flex-wrap items-center justify-center gap-3 reveal">
-        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 HIPAA Compliant</span>
-        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 PIPA Compliant</span>
-        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 PIPEDA Compliant</span>
-        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 NemoClaw Audit Logging</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 Designed for HIPAA Deployment</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 Designed for PIPA &amp; PIPEDA</span>
+        <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 Append-Only Audit Logging</span>
         <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 TLS 1.3 Encrypted</span>
         <span class="badge px-5 py-3 rounded-full text-sm font-medium">🔒 Canadian Data Residency</span>
       </div>
@@ -590,18 +538,48 @@
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════
-       FINAL CTA
-  ══════════════════════════════════ -->
-  <section id="demo" class="py-28 md:py-36 bg-canvas text-center">
+  <!-- WHAT HAPPENS NEXT -->
+  <section class="py-16 bg-canvas">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-10 reveal">
+        <p class="text-xs font-medium uppercase tracking-widest text-accent mb-3">What Happens Next</p>
+        <h2 class="font-display text-3xl md:text-4xl text-ink">A straightforward process.</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 reveal">
+        <div class="text-center px-4">
+          <div class="step-num mx-auto mb-4">1</div>
+          <p class="text-ink text-sm font-medium mb-1">Submit your request</p>
+          <p class="text-muted text-sm font-light leading-relaxed">Share your practice details using the form below.</p>
+        </div>
+        <div class="text-center px-4">
+          <div class="step-num mx-auto mb-4">2</div>
+          <p class="text-ink text-sm font-medium mb-1">We review your intake needs</p>
+          <p class="text-muted text-sm font-light leading-relaxed">We respond by email within one business day.</p>
+        </div>
+        <div class="text-center px-4">
+          <div class="step-num mx-auto mb-4">3</div>
+          <p class="text-ink text-sm font-medium mb-1">We recommend the next step</p>
+          <p class="text-muted text-sm font-light leading-relaxed">If IntakeOS appears to be a fit, we send the secure onboarding questionnaire or propose the appropriate path forward.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FINAL CTA -->
+  <section id="demo" class="py-28 md:py-36 bg-white text-center">
     <div class="max-w-3xl mx-auto px-6 reveal">
 
       <p class="text-xs font-medium uppercase tracking-widest text-accent mb-5">Request Practice Review</p>
       <h2 class="font-display text-4xl md:text-6xl text-ink mb-6 leading-tight">
         Stop losing patients.
       </h2>
-      <p class="text-muted text-lg font-light max-w-xl mx-auto mb-11">
-        Every day without IntakeOS, your clinic misses calls, loses leads, and hands consultations to faster competitors. Get started today — no setup fee, no risk.
+      <p class="text-muted text-lg font-light max-w-xl mx-auto mb-4">
+        Every day without IntakeOS, your practice misses inquiries and hands consultation opportunities to faster competitors.
+      </p>
+      <p class="text-muted text-sm font-light max-w-xl mx-auto mb-11">
+        Share your details and we'll review your practice before recommending the appropriate next step. We respond by email within one business day.
       </p>
       <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
          class="btn-primary inline-block px-10 py-5 rounded-lg font-medium text-lg">
@@ -611,15 +589,13 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════
-       CONTACT MODAL
-  ══════════════════════════════════ -->
+  <!-- CONTACT MODAL -->
   <div id="contact-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(30,41,59,0.5);">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
       <button onclick="document.getElementById('contact-modal').classList.add('hidden')"
               class="absolute top-4 right-5 text-muted text-2xl hover:text-ink transition-colors">&times;</button>
       <h3 class="font-display text-2xl text-ink mb-2">Request Practice Review</h3>
-      <p class="text-muted text-sm font-light mb-6"> Share your details and we’ll review your practice before recommending the appropriate next step.We respond by email within one business day.</p>
+      <p class="text-muted text-sm font-light mb-6">Share your details and we'll review your practice before recommending the appropriate next step. We respond by email within one business day.</p>
       <div id="contact-form" class="space-y-4">
         <input id="f-clinic" type="text" placeholder="Company or Clinic Name"
                class="w-full border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-ice transition-colors" />
@@ -637,27 +613,26 @@
       <div id="contact-success" class="hidden text-center py-6">
         <p class="text-accent text-4xl mb-3">✓</p>
         <p class="font-display text-xl text-ink mb-2">Message received.</p>
-        <p class="text-muted text-sm font-light">Our team will respond within one business day.</p>
+        <p class="text-muted text-sm font-light">We will review your practice and respond by email within one business day.</p>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       FOOTER
-  ══════════════════════════════════ -->
+  <!-- FOOTER -->
   <footer class="bg-white border-t border-border py-10">
     <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-muted text-sm font-light text-center md:text-left">
-      <p class="text-ink/60">© 2026 IntakeOS. All rights reserved.</p>
-      <p>HIPAA & PIPA compliant · British Columbia, Canada & Western United States.</p>
+      <div>
+        <p class="text-ink/60">© 2026 IntakeOS Medical. All rights reserved.</p>
+        <p class="text-muted/50 text-xs mt-1">IntakeOS Medical is operated by Arbitrage Claw — 1008275 B.C. Ltd., British Columbia, Canada.</p>
+      </div>
+      <p>Designed for HIPAA-compliant and Canadian privacy-aligned deployment · British Columbia, Canada &amp; United States.</p>
       <a href="mailto:operations@go.arbitrageclaw.net" class="text-accent hover:text-ice transition-colors">
         operations@go.arbitrageclaw.net
       </a>
     </div>
   </footer>
 
-  <!-- ══════════════════════════════════
-       JAVASCRIPT
-  ══════════════════════════════════ -->
+  <!-- JAVASCRIPT -->
   <script>
     async function submitContactForm() {
       const clinic = document.getElementById('f-clinic').value.trim();
@@ -665,18 +640,11 @@
       const phone  = document.getElementById('f-phone').value.trim();
       const email  = document.getElementById('f-email').value.trim();
       if (!clinic || !name || !email) { alert('Please fill in all required fields.'); return; }
-      const subject = encodeURIComponent('IntakeOS — New Inquiry from ' + clinic);
-      const body = encodeURIComponent('Clinic: ' + clinic + '\nName: ' + name + '\nPhone: ' + phone + '\nEmail: ' + email);
       try {
         const response = await fetch('https://formspree.io/f/mbdvndvg', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            clinic: clinic,
-            name:   name,
-            phone:  phone,
-            email:  email
-          })
+          body: JSON.stringify({ clinic, name, phone, email })
         });
         if (response.ok) {
           document.getElementById('contact-form').classList.add('hidden');
