@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IntakeOS Medical — Interactive Demo</title>
+  <meta name="description" content="Experience how IntakeOS manages patient inquiries from first contact to booked consultation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --canvas:    #F8FAFC;
+      --white:     #FFFFFF;
+      --ink:       #1E293B;
+      --muted:     #64748B;
+      --ice:       #5F97C5;
+      --ice-light: #EBF3FB;
+      --ice-mid:   #B8D4EC;
+      --border:    #E2E8F0;
+      --green:     #16A34A;
+      --green-bg:  #DCFCE7;
+      --amber:     #D97706;
+      --amber-bg:  #FEF3C7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-display { font-family: 'DM Serif Display', serif; }
+
+    /* NAV */
+    .demo-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(248,250,252,0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .demo-nav-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px; color: var(--ink);
+      text-decoration: none;
+    }
+    .demo-nav-label {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ice); background: var(--ice-light);
+      padding: 4px 10px; border-radius: 20px;
+      border: 1px solid var(--ice-mid);
+    }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+    }
+    .progress-track {
+      max-width: 640px; margin: 0 auto;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1; height: 4px; background: var(--border);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--ice);
+      border-radius: 4px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .progress-label {
+      font-size: 12px; color: var(--muted); white-space: nowrap;
+      font-weight: 400;
+    }
+
+    /* MAIN CONTAINER */
+    .demo-main {
+      max-width: 680px; margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* SCREENS */
+    .screen {
+      display: none;
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARD */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .card-body { padding: 32px; }
+    .card-body-sm { padding: 24px; }
+
+    /* EYEBROW */
+    .eyebrow {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ice); margin-bottom: 10px;
+      display: block;
+    }
+
+    /* HEADINGS */
+    h1.screen-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 5vw, 40px);
+      color: var(--ink); line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    h2.screen-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(22px, 4vw, 30px);
+      color: var(--ink); line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .screen-sub {
+      font-size: 15px; color: var(--muted);
+      font-weight: 300; line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; border-radius: 10px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary {
+      background: var(--ice); color: var(--white);
+    }
+    .btn-primary:hover { background: #4A82B0; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(95,151,197,0.28); }
+    .btn-ghost {
+      background: var(--white); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--ice); color: var(--ice); }
+    .btn-lg { padding: 16px 36px; font-size: 16px; }
+    .btn-full { width: 100%; }
+
+    /* CHOICE CARDS */
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 0; }
+    @media (max-width: 500px) { .choice-grid { grid-template-columns: 1fr; } }
+
+    .choice-card {
+      border: 2px solid var(--border);
+      border-radius: 16px; padding: 24px 20px;
+      cursor: pointer; text-align: center;
+      background: var(--white);
+      transition: all 0.2s ease;
+    }
+    .choice-card:hover { border-color: var(--ice); background: var(--ice-light); }
+    .choice-card.selected { border-color: var(--ice); background: var(--ice-light); }
+    .choice-icon { font-size: 32px; margin-bottom: 10px; }
+    .choice-title { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+    .choice-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+    /* OPTION BUTTONS (qualification) */
+    .options-list { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn {
+      width: 100%; text-align: left; padding: 14px 18px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer; font-family: 'Inter', sans-serif;
+      font-size: 14px; color: var(--ink); font-weight: 400;
+      transition: all 0.18s ease; display: flex; align-items: center; gap: 12px;
+    }
+    .option-btn:hover { border-color: var(--ice); background: var(--ice-light); }
+    .option-btn.selected { border-color: var(--ice); background: var(--ice-light); color: var(--ice); }
+    .option-btn .opt-check {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s ease;
+    }
+    .option-btn.selected .opt-check { border-color: var(--ice); background: var(--ice); }
+    .option-btn.selected .opt-check::after { content: '✓'; color: white; font-size: 11px; font-weight: 600; }
+
+    /* PHONE MOCK */
+    .phone-wrap {
+      display: flex; justify-content: center;
+      margin: 20px 0;
+    }
+    .phone-mock {
+      width: 220px; background: #1a1a2e;
+      border-radius: 32px; padding: 20px 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .phone-notch {
+      width: 60px; height: 8px; background: #2d2d4e;
+      border-radius: 4px; margin: 0 auto 16px;
+    }
+    .phone-screen { text-align: center; }
+    .phone-caller { font-size: 13px; color: #8888aa; margin-bottom: 4px; }
+    .phone-name { font-size: 18px; color: white; font-weight: 500; margin-bottom: 4px; }
+    .phone-number { font-size: 13px; color: #8888aa; margin-bottom: 16px; }
+    .phone-status {
+      font-size: 12px; padding: 4px 12px; border-radius: 12px;
+      display: inline-block; margin-bottom: 18px;
+    }
+    .phone-status.incoming { background: rgba(95,151,197,0.2); color: #7db6e0; }
+    .phone-status.answered { background: rgba(22,163,74,0.2); color: #4ade80; }
+    .phone-actions { display: flex; justify-content: center; gap: 16px; }
+    .phone-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .phone-btn.decline { background: #ef4444; }
+    .phone-btn.answer { background: #22c55e; }
+
+    /* PULSE ANIMATION */
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(95,151,197,0.5); }
+      70% { box-shadow: 0 0 0 16px rgba(95,151,197,0); }
+      100% { box-shadow: 0 0 0 0 rgba(95,151,197,0); }
+    }
+    .pulse { animation: pulse-ring 1.4s ease infinite; }
+
+    /* TYPING INDICATOR */
+    .typing-wrap {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px; background: var(--ice-light);
+      border-radius: 12px; border: 1px solid var(--ice-mid);
+      margin-bottom: 16px; width: fit-content;
+    }
+    .typing-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--ice); opacity: 0.5;
+      animation: typingBounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* CHAT BUBBLES */
+    .chat-log { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .bubble {
+      max-width: 88%; padding: 12px 16px;
+      border-radius: 16px; font-size: 14px; line-height: 1.6;
+      font-weight: 300;
+    }
+    .bubble-system {
+      background: var(--ice-light); color: var(--ink);
+      border: 1px solid var(--ice-mid); border-bottom-left-radius: 4px;
+      align-self: flex-start;
+    }
+    .bubble-patient {
+      background: var(--ice); color: white;
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+    }
+    .bubble-label {
+      font-size: 11px; color: var(--muted); margin-bottom: 4px;
+      font-weight: 500; letter-spacing: 0.04em;
+    }
+    .bubble-row { display: flex; flex-direction: column; }
+    .bubble-row.patient { align-items: flex-end; }
+
+    /* CHECKLIST */
+    .checklist { display: flex; flex-direction: column; gap: 10px; }
+    .check-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; background: var(--canvas);
+      border-radius: 12px; border: 1px solid var(--border);
+      opacity: 0; transform: translateX(-8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .check-item.visible { opacity: 1; transform: translateX(0); }
+    .check-icon {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--green-bg); border: 1px solid #86efac;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 11px; color: var(--green);
+      font-weight: 700; margin-top: 1px;
+    }
+    .check-text { font-size: 14px; color: var(--ink); font-weight: 400; line-height: 1.5; }
+    .check-sub { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+    /* BRIEF */
+    .brief-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) { .brief-grid { grid-template-columns: 1fr; } }
+    .brief-item {
+      background: var(--canvas); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .brief-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 500; }
+    .brief-value { font-size: 14px; color: var(--ink); font-weight: 400; }
+
+    /* CALENDAR SLOTS */
+    .slot-list { display: flex; flex-direction: column; gap: 10px; }
+    .slot-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px; background: var(--white);
+      border: 2px solid var(--border); border-radius: 14px;
+      cursor: pointer; width: 100%; text-align: left;
+      transition: all 0.18s ease; font-family: 'Inter', sans-serif;
+    }
+    .slot-btn:hover { border-color: var(--ice); background: var(--ice-light); }
+    .slot-btn.selected { border-color: var(--ice); background: var(--ice-light); }
+    .slot-icon { font-size: 20px; }
+    .slot-day { font-size: 14px; font-weight: 500; color: var(--ink); }
+    .slot-time { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: flex; gap: 16px; padding-bottom: 20px;
+      position: relative;
+    }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--green-bg); border: 2px solid #86efac;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 12px; color: var(--green); font-weight: 700;
+      z-index: 1;
+    }
+    .tl-line {
+      width: 2px; flex: 1; background: var(--border);
+      margin-top: 4px; min-height: 20px;
+    }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-content { padding-top: 4px; }
+    .tl-title { font-size: 14px; font-weight: 500; color: var(--ink); }
+    .tl-time { font-size: 12px; color: var(--muted); font-weight: 300; margin-top: 2px; }
+
+    /* COMPARISON */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-col { border-radius: 16px; padding: 22px 20px; }
+    .compare-col.without { background: #fff8f8; border: 1px solid #fecaca; }
+    .compare-col.with { background: #f0fdf4; border: 1px solid #86efac; }
+    .compare-col-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+    .compare-col.without .compare-col-title { color: #dc2626; }
+    .compare-col.with .compare-col-title { color: var(--green); }
+    .compare-list { display: flex; flex-direction: column; gap: 9px; }
+    .compare-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink); font-weight: 300; line-height: 1.5; }
+    .compare-bullet { flex-shrink: 0; margin-top: 2px; }
+
+    /* SUMMARY BOX */
+    .summary-box {
+      background: var(--ice-light); border: 1px solid var(--ice-mid);
+      border-radius: 14px; padding: 20px;
+    }
+    .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: var(--muted); font-weight: 300; }
+    .summary-val { color: var(--ink); font-weight: 500; text-align: right; }
+
+    /* CONFIRMATION */
+    .confirm-box {
+      background: var(--green-bg); border: 1px solid #86efac;
+      border-radius: 14px; padding: 24px; text-align: center;
+    }
+    .confirm-icon { font-size: 36px; margin-bottom: 8px; }
+    .confirm-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+    .confirm-sub { font-size: 14px; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+    /* PRICING */
+    .pricing-rows { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .pricing-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .pricing-row:last-child { border-bottom: none; background: var(--ice-light); }
+    .pricing-key { color: var(--muted); font-weight: 300; }
+    .pricing-val { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); }
+
+    /* NAV CONTROLS */
+    .nav-controls {
+      display: flex; gap: 12px; margin-top: 32px;
+      justify-content: space-between; align-items: center;
+    }
+    .nav-right { display: flex; gap: 10px; }
+
+    /* NOTICE */
+    .demo-notice {
+      font-size: 11px; color: var(--muted); text-align: center;
+      margin-top: 40px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-weight: 300; line-height: 1.6;
+    }
+
+    /* BADGE */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    }
+    .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #86efac; }
+    .badge-blue { background: var(--ice-light); color: var(--ice); border: 1px solid var(--ice-mid); }
+    .badge-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid #fcd34d; }
+
+    /* SCENARIO BOX */
+    .scenario-box {
+      background: var(--canvas); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .scenario-icon { font-size: 24px; flex-shrink: 0; }
+    .scenario-text { font-size: 14px; color: var(--ink); font-weight: 300; line-height: 1.7; }
+    .scenario-text strong { font-weight: 500; }
+
+    /* DIVIDER */
+    hr.section-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+      display: block;
+    }
+
+    /* QUESTION COUNTER */
+    .q-counter {
+      font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 400;
+    }
+    .q-text { font-size: 16px; color: var(--ink); font-weight: 500; margin-bottom: 16px; line-height: 1.4; }
+
+    /* NOSHOW */
+    .ns-trigger { text-align: center; padding: 24px 0; }
+    .ns-q { font-size: 16px; color: var(--ink); font-weight: 500; margin-bottom: 16px; }
+
+    /* FINAL CTA */
+    .cta-section { text-align: center; padding: 12px 0; }
+    .cta-section h2 { font-family: 'DM Serif Display', serif; font-size: clamp(26px, 4vw, 36px); color: var(--ink); margin-bottom: 12px; }
+    .cta-section p { font-size: 15px; color: var(--muted); font-weight: 300; line-height: 1.7; margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .demo-main { padding: 24px 16px 60px; }
+      .card-body { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="demo-nav">
+    <a href="https://arbitrageclaw.net" class="demo-nav-brand">IntakeOS</a>
+    <span class="demo-nav-label">Interactive Demo</span>
+  </nav>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progressLabel">Demo progress</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="demo-main">
+
+    <!-- SCREEN 1 — INTRO -->
+    <div class="screen active" id="screen-1">
+      <div class="card">
+        <div class="card-body" style="text-align:center; padding: 48px 36px;">
+          <span class="eyebrow">IntakeOS Medical</span>
+          <h1 class="screen-title">Experience IntakeOS from the patient's first inquiry to a booked consultation.</h1>
+          <p class="screen-sub">Follow a prospective patient through every step — from first contact to confirmed appointment — and see how your practice staff remains focused on high-intent patients throughout.</p>
+
+          <div class="scenario-box" style="text-align:left; margin-bottom:32px;">
+            <div class="scenario-icon">🕐</div>
+            <div class="scenario-text">
+              It is <strong>The clinic is currently closed.</strong> Your practice is closed. A prospective patient has just found your clinic and wants to speak with someone about a procedure.
+            </div>
+          </div>
+
+          <p style="font-size:13px; color:var(--muted); margin-bottom:24px; font-weight:300;">No voicemail. No hold time. No callback delay.</p>
+
+          <button class="btn btn-primary btn-lg" onclick="goToScreen(2)">
+            Start Interactive Demo →
+          </button>
+        </div>
+      </div>
+      <div class="demo-notice">
+        This interactive demonstration uses fictional data and does not collect patient information.<br/>
+        Designed for HIPAA-compliant and Canadian privacy-aligned deployment.
+      </div>
+    </div>
+
+    <!-- SCREEN 2 — CHANNEL CHOICE -->
+    <div class="screen" id="screen-2">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 1 of 10</span>
+          <h2 class="screen-title">How does the patient contact the practice?</h2>
+          <p class="screen-sub" style="margin-bottom:24px;">Select the inquiry channel to see how IntakeOS responds.</p>
+
+          <div class="choice-grid">
+            <div class="choice-card" id="choice-phone" onclick="selectChannel('phone')">
+              <div class="choice-icon">📞</div>
+              <div class="choice-title">Phone Call</div>
+              <div class="choice-sub">After-hours call<br/>Practice is closed</div>
+            </div>
+            <div class="choice-card" id="choice-web" onclick="selectChannel('web')">
+              <div class="choice-icon">🌐</div>
+              <div class="choice-title">Website Form</div>
+              <div class="choice-sub">Received after hours<br/>Submitted online</div>
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(1)">← Back</button>
+            <button class="btn btn-primary" id="channel-next-btn" onclick="goToScreen(3)" style="display:none;">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3 — FIRST CONTACT -->
+    <div class="screen" id="screen-3">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 2 of 10</span>
+          <h2 class="screen-title" id="s3-title">IntakeOS answers immediately.</h2>
+          <p class="screen-sub" id="s3-sub">The practice is closed. IntakeOS responds immediately — no voicemail, no hold music.</p>
+
+          <!-- Phone path -->
+          <div id="phone-path">
+            <div class="phone-wrap">
+              <div class="phone-mock">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                  <div class="phone-caller">Incoming Call</div>
+                  <div class="phone-name">Northstar Aesthetic Surgery</div>
+                  <div class="phone-number">Practice Line</div>
+                  <div class="phone-status answered">✓ Answered immediately</div>
+                  <div class="phone-actions">
+                    <div class="phone-btn answer">📞</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-log" style="margin-top:20px;">
+              <div class="bubble-row">
+                <div class="bubble-label">IntakeOS — on behalf of Northstar Aesthetic Surgery</div>
+                <div class="bubble bubble-system">"Thank you for contacting Northstar Aesthetic Surgery. I'm here to help you with your consultation request. Could I start with your name?"</div>
+              </div>
+              <div class="bubble-row patient">
+                <div class="bubble-label">Emily Carter — Prospective Patient</div>
+                <div class="bubble bubble-patient">"Hi, I'm Emily. I'm interested in booking a consultation."</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Web path -->
+          <div id="web-path" style="display:none;">
+            <div class="summary-box" style="margin-bottom:20px;">
+              <div style="font-size:13px; color:var(--muted); margin-bottom:8px; font-weight:400;">Web Form Submitted</div>
+              <div style="font-size:14px; color:var(--ink);">Name: <strong>Emily Carter</strong></div>
+              <div style="font-size:14px; color:var(--ink);">Interest: <strong>Breast Augmentation consultation</strong></div>
+            </div>
+            <div class="chat-log">
+              <div class="typing-wrap">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <span style="font-size:12px; color:var(--muted); margin-left:4px;">IntakeOS responding...</span>
+              </div>
+              <div class="bubble-row" style="margin-top:10px;">
+                <div class="bubble-label">IntakeOS — immediate response</div>
+                <div class="bubble bubble-system">"Hi Emily, thank you for reaching out to Northstar Aesthetic Surgery. I'm here to help with your consultation request and have a few questions to make sure we can find the right appointment for you."</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(2)">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen(4)">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4 — QUALIFICATION Q1 -->
+    <div class="screen" id="screen-4">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 3 of 10 — Qualification</span>
+          <p style="font-size:13px; color:var(--muted); margin-bottom:20px; font-weight:300;">IntakeOS asks qualifying questions defined by this practice. Each practice configures its own criteria.</p>
+
+          <div class="q-counter">Question 1 of 4</div>
+          <div class="q-text">Which procedure is Emily interested in?</div>
+          <div class="options-list" id="q1-options">
+            <button class="option-btn" onclick="selectOption('q1',this,'Breast Augmentation')">
+              <span class="opt-check"></span> Breast Augmentation
+            </button>
+            <button class="option-btn" onclick="selectOption('q1',this,'Rhinoplasty')">
+              <span class="opt-check"></span> Rhinoplasty
+            </button>
+            <button class="option-btn" onclick="selectOption('q1',this,'Tummy Tuck')">
+              <span class="opt-check"></span> Tummy Tuck
+            </button>
+            <button class="option-btn" onclick="selectOption('q1',this,'Still exploring options')">
+              <span class="opt-check"></span> Still exploring options
+            </button>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(3)">← Back</button>
+            <button class="btn btn-primary" id="q1-next" onclick="goToScreen(5)" style="display:none;">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 5 — QUALIFICATION Q2 -->
+    <div class="screen" id="screen-5">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 3 of 10 — Qualification</span>
+          <div class="q-counter">Question 2 of 4</div>
+          <div class="q-text">What is Emily's preferred treatment timeline?</div>
+          <div class="options-list">
+            <button class="option-btn" onclick="selectOption('q2',this,'As soon as possible')">
+              <span class="opt-check"></span> As soon as possible
+            </button>
+            <button class="option-btn" onclick="selectOption('q2',this,'Within 1–3 months')">
+              <span class="opt-check"></span> Within 1–3 months
+            </button>
+            <button class="option-btn" onclick="selectOption('q2',this,'Within 3–6 months')">
+              <span class="opt-check"></span> Within 3–6 months
+            </button>
+            <button class="option-btn" onclick="selectOption('q2',this,'Just researching for now')">
+              <span class="opt-check"></span> Just researching for now
+            </button>
+          </div>
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(4)">← Back</button>
+            <button class="btn btn-primary" id="q2-next" onclick="goToScreen(6)" style="display:none;">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 6 — QUALIFICATION Q3+Q4 -->
+    <div class="screen" id="screen-6">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 3 of 10 — Qualification</span>
+          <div class="q-counter">Questions 3 & 4 of 4</div>
+          <div class="q-text" style="margin-bottom:10px;">Is Emily local to the practice?</div>
+          <div class="options-list" style="margin-bottom:24px;">
+            <button class="option-btn" onclick="selectOption('q3',this,'Local')">
+              <span class="opt-check"></span> Local
+            </button>
+            <button class="option-btn" onclick="selectOption('q3',this,'Travelling from another city')">
+              <span class="opt-check"></span> Travelling from another city
+            </button>
+            <button class="option-btn" onclick="selectOption('q3',this,'Travelling internationally')">
+              <span class="opt-check"></span> Travelling internationally
+            </button>
+          </div>
+
+          <div class="q-text" style="margin-bottom:10px;">Would Emily like financing information?</div>
+          <div class="options-list">
+            <button class="option-btn" onclick="selectOption('q4',this,'Yes')">
+              <span class="opt-check"></span> Yes — please include financing options
+            </button>
+            <button class="option-btn" onclick="selectOption('q4',this,'No')">
+              <span class="opt-check"></span> No — not needed
+            </button>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(5)">← Back</button>
+            <button class="btn btn-primary" id="q34-next" onclick="goToScreen(7)" style="display:none;">See Result →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 7 — QUALIFICATION RESULT -->
+    <div class="screen" id="screen-7">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 4 of 10 — Qualification Result</span>
+          <div style="margin-bottom:20px;">
+            <span class="status-badge badge-green">✓ Suitable to proceed</span>
+          </div>
+          <h2 class="screen-title">Emily meets this practice's initial consultation criteria.</h2>
+          <p style="font-size:14px; color:var(--muted); font-weight:300; margin-bottom:24px; line-height:1.7;">Based on the practice's configured intake criteria, Emily is suitable to proceed to consultation scheduling. No clinical eligibility determination has been made.</p>
+
+          <span class="section-label">Inquiry Summary</span>
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="summary-key">Patient</span>
+              <span class="summary-val">Emily Carter</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Procedure interest</span>
+              <span class="summary-val" id="r-procedure">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Timeline</span>
+              <span class="summary-val" id="r-timeline">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Location</span>
+              <span class="summary-val" id="r-location">—</span>
+            </div>
+            <div class="summary-row" style="border-bottom:none;">
+              <span class="summary-key">Financing interest</span>
+              <span class="summary-val" id="r-financing">—</span>
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(6)">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen(8)">Proceed to Booking →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 8 — BOOKING -->
+    <div class="screen" id="screen-8">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 5 of 10 — Consultation Booking</span>
+          <h2 class="screen-title">Select a consultation time.</h2>
+          <p class="screen-sub" style="margin-bottom:24px;">IntakeOS presents available slots directly from the practice calendar. Emily selects her preferred time.</p>
+
+          <div class="slot-list" id="slot-list">
+            <button class="slot-btn" onclick="selectSlot(this,'Tuesday — 2:30 PM')">
+              <span class="slot-icon">📅</span>
+              <div>
+                <div class="slot-day">Tuesday</div>
+                <div class="slot-time">2:30 PM · Dr. Maya Bennett</div>
+              </div>
+            </button>
+            <button class="slot-btn" onclick="selectSlot(this,'Wednesday — 11:00 AM')">
+              <span class="slot-icon">📅</span>
+              <div>
+                <div class="slot-day">Wednesday</div>
+                <div class="slot-time">11:00 AM · Dr. Maya Bennett</div>
+              </div>
+            </button>
+            <button class="slot-btn" onclick="selectSlot(this,'Friday — 4:00 PM')">
+              <span class="slot-icon">📅</span>
+              <div>
+                <div class="slot-day">Friday</div>
+                <div class="slot-time">4:00 PM · Dr. Maya Bennett</div>
+              </div>
+            </button>
+          </div>
+
+          <div id="booking-confirm" style="display:none; margin-top:20px;">
+            <div class="confirm-box">
+              <div class="confirm-icon">✅</div>
+              <div class="confirm-title">Consultation booked.</div>
+              <div class="confirm-sub">
+                <strong>Northstar Aesthetic Surgery</strong><br/>
+                Dr. Maya Bennett<br/>
+                <span id="booked-slot">Tuesday — 2:30 PM</span><br/><br/>
+                SMS and email confirmations sent to Emily.
+              </div>
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(7)">← Back</button>
+            <button class="btn btn-primary" id="booking-next-btn" onclick="goToScreen(9)" style="display:none;">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 9 — WHAT HAPPENED -->
+    <div class="screen" id="screen-9">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 6 of 10 — Behind the Scenes</span>
+          <h2 class="screen-title">This is what IntakeOS handled automatically.</h2>
+          <p style="font-size:14px; color:var(--muted); font-weight:300; margin-bottom:24px; line-height:1.7;">While your team was unavailable, IntakeOS completed the patient engagement, qualification, and booking workflow without interrupting practice staff.</p>
+
+          <div class="checklist" id="auto-checklist">
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Patient engaged immediately</div><div class="check-sub">Immediate engagement. No voicemail or callback delay.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Initial qualification completed</div><div class="check-sub">Practice-defined criteria applied.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Consultation slot selected and confirmed</div><div class="check-sub">Calendar updated. Appointment secured.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">SMS confirmation sent to Emily</div><div class="check-sub">Appointment details delivered immediately.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Email confirmation sent to Emily</div><div class="check-sub">With appointment details and preparation information.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Practice staff notified</div><div class="check-sub">New booking alert sent to the practice team.</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div><div class="check-text">Pre-Consultation Brief prepared</div><div class="check-sub">Patient summary ready for the clinical team.</div></div>
+            </div>
+            <div class="check-item" style="background:#fff8f0; border-color:#fed7aa;">
+              <div class="check-icon" style="background:#fff7ed; border-color:#fdba74;">—</div>
+              <div><div class="check-text" style="color:var(--amber);">Staff not interrupted</div><div class="check-sub">The practice team was not interrupted during intake.</div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px; padding:16px 18px; background:var(--ice-light); border:1px solid var(--ice-mid); border-radius:12px; font-size:14px; color:var(--ink); font-weight:300; line-height:1.6;">
+            "This is the administrative work your staff did not have to perform."
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(8)">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen(10)">See Pre-Consultation Brief →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 10 — BRIEF + REMINDERS -->
+    <div class="screen" id="screen-10">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 7 of 10 — Pre-Consultation Brief</span>
+          <h2 class="screen-title">Your team receives this before Emily arrives.</h2>
+          <p style="font-size:14px; color:var(--muted); font-weight:300; margin-bottom:24px; line-height:1.7;">IntakeOS prepares a brief operational summary for the clinical team. No medical records are created or modified.</p>
+
+          <div class="brief-grid" style="margin-bottom:24px;">
+            <div class="brief-item">
+              <div class="brief-label">Patient</div>
+              <div class="brief-value">Emily Carter</div>
+            </div>
+            <div class="brief-item">
+              <div class="brief-label">Appointment</div>
+              <div class="brief-value" id="brief-slot">Tuesday — 2:30 PM</div>
+            </div>
+            <div class="brief-item">
+              <div class="brief-label">Procedure Interest</div>
+              <div class="brief-value" id="brief-proc">Breast Augmentation</div>
+            </div>
+            <div class="brief-item">
+              <div class="brief-label">Timeline</div>
+              <div class="brief-value" id="brief-timeline">As soon as possible</div>
+            </div>
+            <div class="brief-item">
+              <div class="brief-label">Location</div>
+              <div class="brief-value" id="brief-loc">Local</div>
+            </div>
+            <div class="brief-item">
+              <div class="brief-label">Financing Interest</div>
+              <div class="brief-value" id="brief-fin">Yes</div>
+            </div>
+            <div class="brief-item" style="grid-column: 1 / -1;">
+              <div class="brief-label">Patient Note</div>
+              <div class="brief-value" style="font-weight:300; color:var(--muted);">"Interested in natural results. Would like to discuss recovery time."</div>
+            </div>
+          </div>
+
+          <hr class="section-divider"/>
+
+          <span class="section-label">Reminders Sent Automatically</span>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-left"><div class="tl-dot">✓</div><div class="tl-line"></div></div>
+              <div class="tl-content"><div class="tl-title">Booking confirmation</div><div class="tl-time">Immediately after booking</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left"><div class="tl-dot">✓</div><div class="tl-line"></div></div>
+              <div class="tl-content"><div class="tl-title">48-hour reminder</div><div class="tl-time">48 hours before consultation</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-left"><div class="tl-dot">✓</div></div>
+              <div class="tl-content"><div class="tl-title">Day-of reminder</div><div class="tl-time">Morning of consultation</div></div>
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(9)">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen(11)">What if Emily doesn't attend? →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 11 — NO-SHOW -->
+    <div class="screen" id="screen-11">
+      <div class="card">
+        <div class="card-body">
+          <span class="eyebrow">Step 8 of 10 — No-Show Recovery</span>
+
+          <div id="ns-question">
+            <div class="ns-trigger">
+              <div style="font-size:40px; margin-bottom:14px;">❓</div>
+              <div class="ns-q">What if Emily does not attend her appointment?</div>
+              <p style="font-size:14px; color:var(--muted); font-weight:300; margin-bottom:24px; line-height:1.7;">IntakeOS follows up and attempts to recover the consultation. Not every no-show will rebook — but the process runs automatically without staff involvement.</p>
+              <button class="btn btn-primary" onclick="showNoShowRecovery()">See No-Show Recovery →</button>
+            </div>
+          </div>
+
+          <div id="ns-recovery" style="display:none;">
+            <div style="margin-bottom:6px;"><span class="status-badge badge-amber">⚠ Missed Consultation Detected</span></div>
+            <h2 class="screen-title" style="margin-top:16px;">IntakeOS follows up automatically.</h2>
+            <div class="checklist" style="margin-bottom:24px;">
+              <div class="check-item visible">
+                <div class="check-icon" style="background:var(--amber-bg); border-color:#fcd34d; color:var(--amber);">!</div>
+                <div><div class="check-text">Missed consultation identified</div><div class="check-sub">Tuesday 2:30 PM — Emily did not attend.</div></div>
+              </div>
+              <div class="check-item visible" style="transition-delay:0.1s;">
+                <div class="check-icon">✓</div>
+                <div><div class="check-text">Follow-up message sent to Emily</div><div class="check-sub">"We noticed you weren't able to make it — we'd love to reschedule."</div></div>
+              </div>
+              <div class="check-item visible" style="transition-delay:0.2s;">
+                <div class="check-icon">✓</div>
+                <div><div class="check-text">New appointment options offered</div><div class="check-sub">Emily selects Thursday — 3:00 PM.</div></div>
+              </div>
+              <div class="check-item visible" style="transition-delay:0.3s;">
+                <div class="check-icon">✓</div>
+                <div><div class="check-text">Consultation rebooked</div><div class="check-sub">Calendar updated. New confirmations sent.</div></div>
+              </div>
+            </div>
+            <div style="padding:14px 16px; background:var(--ice-light); border:1px solid var(--ice-mid); border-radius:12px; font-size:13px; color:var(--muted); font-weight:300; line-height:1.6;">
+              IntakeOS attempts to recover the consultation. Results will vary based on patient circumstances.
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn btn-ghost" onclick="goToScreen(10)">← Back</button>
+            <button class="btn btn-primary" id="ns-next-btn" onclick="goToScreen(12)" style="display:none;">See Business Outcome →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 12 — OUTCOME + CTA -->
+    <div class="screen" id="screen-12">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-body">
+          <span class="eyebrow">Step 9 of 10 — Business Outcome</span>
+          <h2 class="screen-title">Your marketing generates the inquiry.<br/>IntakeOS manages the path to a booked consultation.</h2>
+
+          <div class="compare-grid" style="margin-bottom:24px;">
+            <div class="compare-col without">
+              <div class="compare-col-title">✗ Without IntakeOS</div>
+              <div class="compare-list">
+                <div class="compare-item"><span class="compare-bullet">—</span> Voicemail or delayed response</div>
+                <div class="compare-item"><span class="compare-bullet">—</span> Staff callback queue</div>
+                <div class="compare-item"><span class="compare-bullet">—</span> Repeated follow-up attempts</div>
+                <div class="compare-item"><span class="compare-bullet">—</span> Unqualified consultations booked</div>
+                <div class="compare-item"><span class="compare-bullet">—</span> Missed booking opportunities</div>
+                <div class="compare-item"><span class="compare-bullet">—</span> Staff time consumed on intake</div>
+              </div>
+            </div>
+            <div class="compare-col with">
+              <div class="compare-col-title">✓ With IntakeOS</div>
+              <div class="compare-list">
+                <div class="compare-item"><span class="compare-bullet">→</span> Immediate patient engagement</div>
+                <div class="compare-item"><span class="compare-bullet">→</span> Practice-defined qualification</div>
+                <div class="compare-item"><span class="compare-bullet">→</span> Consultation booking</div>
+                <div class="compare-item"><span class="compare-bullet">→</span> Confirmations and reminders</div>
+                <div class="compare-item"><span class="compare-bullet">→</span> No-show follow-up</div>
+                <div class="compare-item"><span class="compare-bullet">→</span> Staff focused on high-intent patients</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="section-divider"/>
+
+          <span class="section-label">Pricing</span>
+          <div class="pricing-rows" style="margin-bottom:0;">
+            <div class="pricing-row">
+              <span class="pricing-key">Setup</span>
+              <span class="pricing-val">$0</span>
+            </div>
+            <div class="pricing-row">
+              <span class="pricing-key">Per verified attended consultation</span>
+              <span class="pricing-val">$150 USD</span>
+            </div>
+            <div class="pricing-row">
+              <span class="pricing-key" style="font-size:13px; max-width:200px; line-height:1.5;">Monthly minimum — only if zero consultations attend in a calendar month</span>
+              <span class="pricing-val">$100 USD</span>
+            </div>
+          </div>
+          <p style="font-size:12px; color:var(--muted); font-weight:300; margin-top:12px; line-height:1.6;">No charge applies to an individual no-show. If one or more consultations are attended during a calendar month, no additional monthly minimum applies.</p>
+        </div>
+      </div>
+
+      <!-- FINAL CTA CARD -->
+      <div class="card">
+        <div class="card-body" style="padding:40px 32px;">
+          <div class="cta-section">
+            <span class="eyebrow">Step 10 of 10</span>
+            <h2>See how IntakeOS could work for your practice.</h2>
+            <p>Request a Practice Review. We will review your intake needs and respond by email within one business day.</p>
+            <div class="cta-buttons">
+              <a href="https://arbitrageclaw.net/#demo" class="btn btn-primary btn-lg" target="_blank">
+                Request Practice Review →
+              </a>
+              <button class="btn btn-ghost btn-lg" onclick="restartDemo()">
+                ↺ Restart Demo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-notice">
+        This interactive demonstration uses fictional data and does not collect patient information.<br/>
+        IntakeOS Medical is operated by Arbitrage Claw — 1008275 B.C. Ltd., British Columbia, Canada.<br/>
+        Designed for HIPAA-compliant and Canadian privacy-aligned deployment.
+      </div>
+    </div>
+
+  </div><!-- /demo-main -->
+
+  <script>
+    // STATE
+    const state = {
+      channel: null,
+      q1: null, q2: null, q3: null, q4: null,
+      slot: null,
+      totalScreens: 12,
+      nsShown: false
+    };
+
+    // PROGRESS
+    function updateProgress(screenNum) {
+      const pct = ((screenNum - 1) / (state.totalScreens - 1)) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = 'Step ' + screenNum + ' of ' + state.totalScreens;
+    }
+
+    // NAVIGATE
+    function goToScreen(n) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + n).classList.add('active');
+      updateProgress(n);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (n === 7) populateSummary();
+      if (n === 9) animateChecklist();
+      if (n === 10) populateBrief();
+    }
+
+    // CHANNEL SELECTION
+    function selectChannel(ch) {
+      state.channel = ch;
+      document.getElementById('choice-phone').classList.toggle('selected', ch === 'phone');
+      document.getElementById('choice-web').classList.toggle('selected', ch === 'web');
+      document.getElementById('channel-next-btn').style.display = 'inline-flex';
+
+      // Update screen 3
+      if (ch === 'phone') {
+        document.getElementById('phone-path').style.display = 'block';
+        document.getElementById('web-path').style.display = 'none';
+        document.getElementById('s3-title').textContent = 'IntakeOS answers immediately.';
+        document.getElementById('s3-sub').textContent = 'The practice is closed. IntakeOS picks up within seconds — no voicemail, no hold music.';
+      } else {
+        document.getElementById('phone-path').style.display = 'none';
+        document.getElementById('web-path').style.display = 'block';
+        document.getElementById('s3-title').textContent = 'IntakeOS responds in 12 seconds.';
+        document.getElementById('s3-sub').textContent =  'Emily submits the web form after hours. IntakeOS acknowledges the inquiry and begins the qualifying conversation immediately.';
+      }
+    }
+
+    // OPTION SELECTION (qualification)
+    const qNextMap = { q1: 'q1-next', q2: 'q2-next' };
+
+    function selectOption(qId, btn, val) {
+      state[qId] = val;
+      btn.closest('.options-list, .card-body').querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.querySelector('.opt-check').innerHTML = '';
+      });
+
+      // Find all options in same group
+      const container = btn.closest('.options-list') || btn.parentElement;
+      container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      btn.querySelector('.opt-check').innerHTML = '';
+
+      // Show next btn
+      const nextId = qNextMap[qId];
+      if (nextId) document.getElementById(nextId).style.display = 'inline-flex';
+
+      // Q3+Q4 combined check
+      if (qId === 'q3' || qId === 'q4') {
+        if (state.q3 && state.q4) document.getElementById('q34-next').style.display = 'inline-flex';
+      }
+    }
+
+    // Proper per-group option selection for qualification screens
+    document.querySelectorAll('.options-list').forEach(list => {
+      list.addEventListener('click', (e) => {
+        const btn = e.target.closest('.option-btn');
+        if (!btn) return;
+        list.querySelectorAll('.option-btn').forEach(b => {
+          b.classList.remove('selected');
+          b.querySelector('.opt-check').innerHTML = '';
+        });
+        btn.classList.add('selected');
+      });
+    });
+
+    // SUMMARY POPULATION
+    function populateSummary() {
+      document.getElementById('r-procedure').textContent = state.q1 || 'Breast Augmentation';
+      document.getElementById('r-timeline').textContent  = state.q2 || 'As soon as possible';
+      document.getElementById('r-location').textContent  = state.q3 || 'Local';
+      document.getElementById('r-financing').textContent = state.q4 || 'Yes';
+    }
+
+    // SLOT SELECTION
+    function selectSlot(btn, label) {
+      state.slot = label;
+      document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('booked-slot').textContent = label;
+      document.getElementById('booking-confirm').style.display = 'block';
+      document.getElementById('booking-next-btn').style.display = 'inline-flex';
+
+      // Update brief slot
+      const shortSlot = label.replace(' — ', '\n');
+      const slotDisplay = label.split('—')[0].trim();
+      document.getElementById('brief-slot').textContent = label;
+    }
+
+    // BRIEF POPULATION
+    function populateBrief() {
+      document.getElementById('brief-proc').textContent     = state.q1 || 'Breast Augmentation';
+      document.getElementById('brief-timeline').textContent = state.q2 || 'As soon as possible';
+      document.getElementById('brief-loc').textContent      = state.q3 || 'Local';
+      document.getElementById('brief-fin').textContent      = state.q4 || 'Yes';
+      if (state.slot) document.getElementById('brief-slot').textContent = state.slot;
+    }
+
+    // CHECKLIST ANIMATION
+    function animateChecklist() {
+      const items = document.querySelectorAll('#auto-checklist .check-item');
+      items.forEach((item, i) => {
+        setTimeout(() => item.classList.add('visible'), i * 120);
+      });
+    }
+
+    // NO-SHOW REVEAL
+    function showNoShowRecovery() {
+      document.getElementById('ns-question').style.display = 'none';
+      document.getElementById('ns-recovery').style.display = 'block';
+      document.getElementById('ns-next-btn').style.display = 'inline-flex';
+      state.nsShown = true;
+    }
+
+    // RESTART
+    function restartDemo() {
+      state.channel = null;
+      state.q1 = null; state.q2 = null; state.q3 = null; state.q4 = null;
+      state.slot = null; state.nsShown = false;
+
+      // Reset choices
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.querySelector('.opt-check').innerHTML = '';
+      });
+      document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+
+      document.getElementById('channel-next-btn').style.display = 'none';
+      document.getElementById('q1-next').style.display = 'none';
+      document.getElementById('q2-next').style.display = 'none';
+      document.getElementById('q34-next').style.display = 'none';
+      document.getElementById('booking-confirm').style.display = 'none';
+      document.getElementById('booking-next-btn').style.display = 'none';
+      document.getElementById('ns-question').style.display = 'block';
+      document.getElementById('ns-recovery').style.display = 'none';
+      document.getElementById('ns-next-btn').style.display = 'none';
+
+      document.querySelectorAll('.check-item').forEach(i => i.classList.remove('visible'));
+
+      goToScreen(1);
+    }
+
+    // INIT
+    updateProgress(1);
+  </script>
+</body>
+</html>
