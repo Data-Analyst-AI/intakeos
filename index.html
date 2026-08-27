@@ -667,7 +667,12 @@
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({ clinic, name, phone, email })
         });
-        if (response.ok) {
+        if (response.ok) { 
+           if (typeof gtag === 'function') {
+          gtag('event', 'generate_lead', {
+            form_name: 'request_practice_review'
+          });
+        }
           document.getElementById('contact-form').classList.add('hidden');
           document.getElementById('contact-success').classList.remove('hidden');
         } else {
