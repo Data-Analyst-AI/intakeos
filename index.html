@@ -691,6 +691,9 @@ src="https://www.facebook.com/tr?id=1820619469375372&ev=PageView&noscript=1"
             form_name: 'request_practice_review'
           });
         }
+          if (typeof fbq === 'function') {
+          fbq('track', 'Lead');
+        }
           document.getElementById('contact-form').classList.add('hidden');
           document.getElementById('contact-success').classList.remove('hidden');
         } else {
